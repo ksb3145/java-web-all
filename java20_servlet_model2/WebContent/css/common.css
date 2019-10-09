@@ -1,0 +1,18 @@
+@CHARSET "EUC-KR";
+
+.header {padding: 10 0;}
+.header .list-inline { margin-top: 21px; }
+.header .list-inline li { padding-left: 10px; }
+
+.card .list-inline { height: 25px; }
+
+
+.logo,
+.list-inline { line-height :3; }
+
+.vertical-top { vertical-align: top; }
+.display-ib { display:inline-block; }
+
+
+.list-inline li { display: inline-block;  }
+.list-inline .float-r { float:right; }

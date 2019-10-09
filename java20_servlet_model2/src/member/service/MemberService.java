@@ -11,27 +11,40 @@ public class MemberService {
 	
 	
 	// 회원가입
-	public boolean join ( String userId, String userPw, String userName, String userEmail ) {
+//	public MemberVO join(String userId, String userPw, String userName, String userEmail){
+//	
+//		if ( memberDao.selectOne( userId ) == null ){
+//			
+//			MemberVO mvo = new MemberVO();
+//			
+//			mvo.setmUserId( userId );
+//			mvo.setmUserPw( userPw );
+//			mvo.setmUserName( userName );
+//			mvo.setmUserEmail( userEmail );
+//			
+//			memberDao.insertMember( mvo );
+//			
+//			
+//			return mvo;
+//		} else {
+//			return null;
+//		}
+//	}
 	
-		if ( memberDao.selectOne( userId ) == null ){
-			MemberVO mvo = new MemberVO();
-			
-			mvo.setmUserId( userId );
-			mvo.setmUserPw( userPw );
-			mvo.setmUserName( userName );
-			mvo.setmUserEmail( userEmail );
-			
-			memberDao.insertMember( mvo );
-			
-			return true;
+	public MemberVO join(MemberVO mvo){
+		if (memberDao.selectOne(mvo.getmUserId()) == null){
+			memberDao.insertMember(mvo);
+			return mvo;
 		} else {
-			return false;
+			return null;
 		}
 	}
 	
 	//로그인 체크
-	public MemberVO login( String userId, String userPw ) {
+	public MemberVO login(String userId, String userPw) {
+		
 		MemberVO mvo = memberDao.selectOne(userId);
+		
 		//1. 실패) 아이디 없음
 		if( null == mvo ) {
 			return null;

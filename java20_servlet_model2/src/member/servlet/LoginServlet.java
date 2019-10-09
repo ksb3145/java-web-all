@@ -46,7 +46,6 @@ public class LoginServlet extends HttpServlet {
 			
 			if(command.equals("home")){
 				
-				String msg = (String) session.getAttribute("msg");
 				MemberVO mvo = (MemberVO) session.getAttribute("sessionVO");
 				
 				if(null == mvo){
@@ -71,10 +70,11 @@ public class LoginServlet extends HttpServlet {
 				
 				if(null != mvo){
 					location = "/WEB-INF/views/board/list.jsp";
+					
 					req.setAttribute("code", "OK");
 					req.setAttribute("msg", "로그인 성공");
-					session.setAttribute("sessionVO", mvo);	
-					session.setAttribute("msg", "로그인 성공!");	
+					session.setAttribute("sessionVO", mvo);
+					
 					System.out.println("로그인 성공");
 					
 				} else {
@@ -101,29 +101,36 @@ public class LoginServlet extends HttpServlet {
 				System.out.println("회원가입...");
 				
 				// 회원가입 처리
-				Boolean result;
 				String userId = req.getParameter("userId");
 				String userPw = req.getParameter("userPw");
 				String userName = req.getParameter("userName");
 				String userEmail = req.getParameter("userEmail");
+				
 				System.out.println(userId+"/"+userPw+"/"+userName+"/"+userEmail);
 				
-				result = service.join(userId, userPw, userName, userEmail);
-				System.out.println("result=>"+result);
+				MemberVO mvo = new MemberVO();
+				mvo.setmUserId(userId);
+				mvo.setmUserPw(userPw);
+				mvo.setmUserName(userName);
+				mvo.setmUserPw(userEmail);
 				
-				if(result){
+				MemberVO resultVO = service.join(mvo);
+				
+				
+				if(null != resultVO){
 					// 가입성공
 					location = "/WEB-INF/views/common/home.jsp";
 					
 					req.setAttribute("code", "OK");
-					req.setAttribute("msg", "가입완료");
-					req.getSession().setAttribute("userId", userId);
+					req.setAttribute("msg", "로그인 성공");
+					session.setAttribute("sessionVO", resultVO);	
+					
 				}else{
 					// 가입실패
 					location = "/WEB-INF/views/member/login.jsp";
 					
 					req.setAttribute("code", "Fail");
-					req.setAttribute("msg","가입실패");
+					req.setAttribute("msg","가입 실패!");
 				}
 				
 				RequestDispatcher rd = req.getRequestDispatcher(location);

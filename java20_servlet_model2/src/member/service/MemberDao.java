@@ -67,6 +67,7 @@ public class MemberDao {
 			
 			if( rs.next() ){
 				mvo = new MemberVO();
+				mvo.setmId( rs.getInt("mId") );
 				mvo.setmUserId( rs.getString("mUserId") );
 				mvo.setmUserPw( rs.getString("mUserPw") );
 				mvo.setmUserName( rs.getString("mUserName") );

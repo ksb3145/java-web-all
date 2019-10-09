@@ -3,8 +3,8 @@ package board;
 public class BoardVO {
 	
 	private int bId;
-	private String bName;
-	private String bWiter;
+	private String mUserId;
+	private String bTitle;
 	private String bContent;
 	private int bHit;
 	private String bRegDate;
@@ -14,17 +14,17 @@ public class BoardVO {
 	public void setbId(int bId) {
 		this.bId = bId;
 	}
-	public String getbName() {
-		return bName;
+	public String getmUserId() {
+		return mUserId;
 	}
-	public void setbName(String bName) {
-		this.bName = bName;
+	public void setmUserId(String mUserId) {
+		this.mUserId = mUserId;
 	}
-	public String getbWiter() {
-		return bWiter;
+	public String getbTitle() {
+		return bTitle;
 	}
-	public void setbWiter(String bWiter) {
-		this.bWiter = bWiter;
+	public void setbTitle(String bTitle) {
+		this.bTitle = bTitle;
 	}
 	public String getbContent() {
 		return bContent;
@@ -45,11 +45,12 @@ public class BoardVO {
 		this.bRegDate = bRegDate;
 	}
 	
+	
 	@Override
 	public String toString() {
-		return "BoardVO [bId=" + bId + ", bName=" + bName + ", bWiter="
-				+ bWiter + ", bContent=" + bContent + ", bHit=" + bHit
-				+ ", bRegDate=" + bRegDate + "]";
+		return "BoardVO [bId=" + bId + ", mUserId=" + mUserId + ", bTitle=" + bTitle + ", bContent=" + bContent
+				+ ", bHit=" + bHit + ", bRegDate=" + bRegDate + "]";
 	}
+	
 	
 }

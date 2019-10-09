@@ -7,8 +7,10 @@
 	
 		<div class="col-md-12">
 			<h4>글쓰기</h4>
-			<form action="/boardServlet" method="post" class="form-horizontal">
-				<input type="hidden" name="command" value="bbsInsert">
+			<form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
+				<input type="text" id="command" name="command" value="bbsInsert" />
+				<input type="text" id="userId" name="userId" value="${sessionVO.mUserId}" />
+				
 				<div class="form-group">
 					<label for="title">제목</label>
 					<input type="text" class="form-control" id="title" name="title" value="" placeholder="아이디를 입력하세요." />
@@ -23,24 +25,26 @@
 					<label for="file-upload">파일업로드</label>
 					<input type="file" class="form-control" id="file-upload" name="file-upload" />
 				</div>
+				
+				<div class="col-md-12">
+					<ul class="list-inline">
+						<li>
+							<a href="/BoardServlet?command=bbsList" class="btn btn-primary">목록</a>
+						</li>
+						<li class="float-r">
+							<c:if test="${sessionVO.mUserId ne null}">
+								<button type="submit" class="btn btn-success">등록</button>
+								<!-- <button type="submit" class="btn btn-warning">수정</button> -->
+							</c:if>
+						</li>
+						
+						
+					</ul>
+				</div>
 			</form>
 		</div>
 		
-		<div class="col-md-12">
-			<ul class="list-inline">
-				<li>
-					<a href="/BoardServlet?command=bbsList" class="btn btn-primary">목록</a>
-				</li>
-				<li class="float-r">
-					<c:if test="${userId ne null}">
-						<button type="submit" class="btn btn-success">등록</button>
-						<button type="submit" class="btn btn-warning">수정</button>
-					</c:if>
-				</li>
-				
-				
-			</ul>
-		</div>
+		
 		
 	</div>
 	

@@ -1,11 +1,21 @@
 package member.vo;
 
+import java.util.Date;
+
 public class MemberVO {
+	private int mId;
 	private String mUserId;
 	private String mUserPw;
 	private String mUserName;
 	private String mUserEmail;
+	private Date mRegDate;
 	
+	public int getmId() {
+		return mId;
+	}
+	public void setmId(int mId) {
+		this.mId = mId;
+	}
 	public String getmUserId() {
 		return mUserId;
 	}
@@ -30,10 +40,16 @@ public class MemberVO {
 	public void setmUserEmail(String mUserEmail) {
 		this.mUserEmail = mUserEmail;
 	}
+	public Date getmRegDate() {
+		return mRegDate;
+	}
+	public void setmRegDate(Date mRegDate) {
+		this.mRegDate = mRegDate;
+	}
 	@Override
 	public String toString() {
-		return "MemberVO [mUserId=" + mUserId + ", mUserPw=" + mUserPw
-				+ ", mUserName=" + mUserName + ", mUserEmail=" + mUserEmail
-				+ "]";
+		return "MemberVO [mId=" + mId + ", mUserId=" + mUserId + ""
+				+ ", mUserPw=" + mUserPw + ", mUserName=" + mUserName 
+				+ ", mUserEmail=" + mUserEmail + ", mRegDate=" + mRegDate + "]";
 	}
 }

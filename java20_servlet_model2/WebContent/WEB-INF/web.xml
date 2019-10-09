@@ -29,14 +29,15 @@
     <servlet-name>Board</servlet-name>
     <url-pattern>/BoardServlet</url-pattern>
   </servlet-mapping>
-  <error-page>
+  
+  <!-- <error-page>
     <error-code>404</error-code>
     <location>/errorPage.jsp</location>
   </error-page>
   <error-page>
     <error-code>500</error-code>
     <location>/errorPage.jsp</location>
-  </error-page>
+  </error-page> -->
   
   <session-config>
     <session-timeout>10</session-timeout>

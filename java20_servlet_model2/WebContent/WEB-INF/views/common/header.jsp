@@ -23,10 +23,10 @@
 			<div class="col-md-9 col-md-offset-1">
 				<ul class="list-inline">
 					<c:choose>
-						<c:when test="${userId ne null}">
+						<c:when test="${sessionVO.mUserId ne null}">
 							<li class="text-center"><a href="/BoardServlet?command=bbsList">게시판</a></li>
 							<li class="text-center float-r"><small><a href="#">로그아웃</a></small></li>
-							<li class="text-center float-r"><small><c:out value="${userId}" /> 님</small></li>
+							<li class="text-center float-r"><small><c:out value="${sessionVO.mUserId}" /> 님</small></li>
 						</c:when>
 						<c:otherwise>
 							<li class="text-center float-r"><a href="/loginServlet?command=joinForm">회원가입</a></li>

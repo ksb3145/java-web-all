@@ -58,7 +58,8 @@ public class LoginServlet extends HttpServlet {
 					
 					req.setAttribute("code", "OK");
 					req.setAttribute("msg", "로그인 성공");
-					req.getSession().setAttribute("userId", userId);		
+					req.getSession().setAttribute("userId", userId);	
+					
 					
 					System.out.println("로그인 성공");
 				} else {

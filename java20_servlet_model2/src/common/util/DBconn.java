@@ -12,11 +12,11 @@ public class DBconn {
 		if(dbConn == null){
 			// db 정보
 			String driverName = "com.mysql.jdbc.Driver";
-			String url = "jdbc:mysql://ncom.iptime.org/test_bom?useUnicode=true&characterEncoding=utf8";
-			//String url = "jdbc:mysql://localhost/bom_test?useUnicode=true&characterEncoding=utf8";
+			//String url = "jdbc:mysql://ncom.iptime.org/test_bom?useUnicode=true&characterEncoding=utf8";
+			String url = "jdbc:mysql://localhost/bom_test?useUnicode=true&characterEncoding=utf8";
 			String id = "root";
-			String pw = "ncom";
-			//String pw = "root!";
+			//String pw = "ncom";
+			String pw = "root!";
 			
 			Class.forName(driverName);
 			System.out.println("드라이버 로드 ...");

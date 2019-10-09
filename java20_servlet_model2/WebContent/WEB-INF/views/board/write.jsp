@@ -29,12 +29,16 @@
 		<div class="col-md-12">
 			<ul class="list-inline">
 				<li>
-					<button type="submit" class="btn btn-primary">목록</button>
+					<a href="/BoardServlet?command=bbsList" class="btn btn-primary">목록</a>
 				</li>
 				<li class="float-r">
-					<button type="submit" class="btn btn-success">등록</button>
-					<button type="submit" class="btn btn-warning">수정</button>
+					<c:if test="${userId ne null}">
+						<button type="submit" class="btn btn-success">등록</button>
+						<button type="submit" class="btn btn-warning">수정</button>
+					</c:if>
 				</li>
+				
+				
 			</ul>
 		</div>
 		

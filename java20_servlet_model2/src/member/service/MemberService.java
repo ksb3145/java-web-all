@@ -29,27 +29,22 @@ public class MemberService {
 		}
 	}
 	
-	// 로그인
-	public boolean login( String userId, String userPw ) {
+	//로그인 체크
+	public MemberVO login( String userId, String userPw ) {
 		MemberVO mvo = memberDao.selectOne(userId);
-		//로그인 체크
-		
 		//1. 실패) 아이디 없음
-		if( mvo == null ) {
-			return false;
+		if( null == mvo ) {
+			return null;
 		} else {
 			//2. 성공) 로그인 정보 일치
 			if( mvo.getmUserPw().equals(userPw) ) {
-				return true;
-			} else {
-				// 3. 실패) 로그인 정보 불일치
-				return false;
+				return mvo;
+			}
+			// 3. 실패) 로그인 정보 불일치
+			else{
+				return null;
 			}
 		}
 	}
-	
-	
-	
-	
 
 }

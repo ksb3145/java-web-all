@@ -4,7 +4,7 @@ public class BoardVO {
 	
 	private int bId;
 	private String bName;
-	private String bRirle;
+	private String bWiter;
 	private String bContent;
 	private int bHit;
 	private String bRegDate;
@@ -20,11 +20,11 @@ public class BoardVO {
 	public void setbName(String bName) {
 		this.bName = bName;
 	}
-	public String getbRirle() {
-		return bRirle;
+	public String getbWiter() {
+		return bWiter;
 	}
-	public void setbRirle(String bRirle) {
-		this.bRirle = bRirle;
+	public void setbWiter(String bWiter) {
+		this.bWiter = bWiter;
 	}
 	public String getbContent() {
 		return bContent;
@@ -47,8 +47,8 @@ public class BoardVO {
 	
 	@Override
 	public String toString() {
-		return "BoardVO [bId=" + bId + ", bName=" + bName + ", bRirle="
-				+ bRirle + ", bContent=" + bContent + ", bHit=" + bHit
+		return "BoardVO [bId=" + bId + ", bName=" + bName + ", bWiter="
+				+ bWiter + ", bContent=" + bContent + ", bHit=" + bHit
 				+ ", bRegDate=" + bRegDate + "]";
 	}
 	

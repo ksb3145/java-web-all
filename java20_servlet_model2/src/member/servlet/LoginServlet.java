@@ -7,8 +7,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import member.service.MemberService;
+import member.vo.MemberVO;
 
 public class LoginServlet extends HttpServlet {
 		private static final long serialVersionUID = 1L;
@@ -40,12 +42,23 @@ public class LoginServlet extends HttpServlet {
 			String location = "";
 			String command = req.getParameter("command");
 			
+			HttpSession session = req.getSession();
+			
 			if(command.equals("home")){
-				location= "/WEB-INF/views/member/login.jsp";
 				
-				req.setAttribute("defaultId", "ksb");
+				String msg = (String) session.getAttribute("msg");
+				MemberVO mvo = (MemberVO) session.getAttribute("sessionVO");
+				
+				if(null == mvo){
+					location= "/WEB-INF/views/member/login.jsp";
+				}else{
+					location= "/WEB-INF/views/member/home.jsp";
+				}
+				
 				RequestDispatcher rd = req.getRequestDispatcher(location);
 				rd.forward(req, resp);
+				
+				//System.out.println();
 				
 			}else if( command.equals("login") ) {
 				System.out.println("로그인");
@@ -53,15 +66,17 @@ public class LoginServlet extends HttpServlet {
 				String userId = req.getParameter("userId");
 				String userPw = req.getParameter("userPw");
 				
-				if( service.login(userId, userPw) ){
+				
+				MemberVO mvo = service.login(userId, userPw);
+				
+				if(null != mvo){
 					location = "/WEB-INF/views/board/list.jsp";
-					
 					req.setAttribute("code", "OK");
 					req.setAttribute("msg", "로그인 성공");
-					req.getSession().setAttribute("userId", userId);	
-					
-					
+					session.setAttribute("sessionVO", mvo);	
+					session.setAttribute("msg", "로그인 성공!");	
 					System.out.println("로그인 성공");
+					
 				} else {
 					location = "/WEB-INF/views/member/login.jsp";
 					

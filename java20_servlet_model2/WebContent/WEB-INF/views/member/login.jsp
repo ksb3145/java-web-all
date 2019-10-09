@@ -8,7 +8,7 @@
 		<div class="col-md-4 col-sm-8">
 			<h4>LOGIN</h4>
 			
-			<form action="/loginServlet" method="post">
+			<form id="frm" action="/loginServlet" method="post">
 				<input type="hidden" name="command" value="login">
 				
 				<div class="form-group">

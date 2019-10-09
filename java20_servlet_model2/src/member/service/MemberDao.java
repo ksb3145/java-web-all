@@ -1,14 +1,12 @@
 package member.service;
 
-import java.lang.reflect.Member;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import member.vo.MemberVO;
-
 import common.util.DBconn;
+import member.vo.MemberVO;
 
 public class MemberDao {
 	private static MemberDao instance;
@@ -20,9 +18,8 @@ public class MemberDao {
 	
 	private Connection conn;
 	private MemberDao(){
-		DBconn db = new DBconn();
 		try {
-			conn = db.getConnection();
+			conn = DBconn.getConnection();
 		} catch ( ClassNotFoundException | SQLException e ) {
 			e.printStackTrace();
 		}

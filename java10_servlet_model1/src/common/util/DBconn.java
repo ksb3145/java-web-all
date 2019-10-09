@@ -12,16 +12,19 @@ public class DBconn {
 		if(dbConn == null){
 			// db 정보
 			String driverName = "com.mysql.jdbc.Driver";
-			String url = "jdbc:mysql://ncom.iptime.org/test_bom?useUnicode=true&characterEncoding=utf8";
-			//String url = "jdbc:mysql://localhost/bom_test?useUnicode=true&characterEncoding=utf8";
+			//String url = "jdbc:mysql://ncom.iptime.org/test_bom?useUnicode=true&characterEncoding=utf8";
+			//String id = "root";
+			//String pw = "ncom";
+			
+			String url = "jdbc:mysql://localhost:3306/testDB?useUnicode=true&characterEncoding=utf8";
 			String id = "root";
-			String pw = "ncom";
-			//String pw = "root!";
+			String pw = "0000";
 			
 			Class.forName(driverName);
 			System.out.println("드라이버 로드 ...");
 			
 			dbConn = DriverManager.getConnection(url, id, pw);
+			
 			System.out.println("DB 연결 성공 ...");
 		}
 		

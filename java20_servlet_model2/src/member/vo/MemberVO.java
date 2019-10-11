@@ -3,53 +3,54 @@ package member.vo;
 import java.util.Date;
 
 public class MemberVO {
-	private int mId;
-	private String mUserId;
-	private String mUserPw;
-	private String mUserName;
-	private String mUserEmail;
-	private Date mRegDate;
+	private int id;
+	private String userId;
+	private String userPw;
+	private String userName;
+	private String userEmail;
+	private Date regDate;
 	
-	public int getmId() {
-		return mId;
+	public int getId() {
+		return id;
 	}
-	public void setmId(int mId) {
-		this.mId = mId;
+	public void setId(int id) {
+		this.id = id;
 	}
-	public String getmUserId() {
-		return mUserId;
+	public String getUserId() {
+		return userId;
 	}
-	public void setmUserId(String mUserId) {
-		this.mUserId = mUserId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	public String getmUserPw() {
-		return mUserPw;
+	public String getUserPw() {
+		return userPw;
 	}
-	public void setmUserPw(String mUserPw) {
-		this.mUserPw = mUserPw;
+	public void setUserPw(String userPw) {
+		this.userPw = userPw;
 	}
-	public String getmUserName() {
-		return mUserName;
+	public String getUserName() {
+		return userName;
 	}
-	public void setmUserName(String mUserName) {
-		this.mUserName = mUserName;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
-	public String getmUserEmail() {
-		return mUserEmail;
+	public String getUserEmail() {
+		return userEmail;
 	}
-	public void setmUserEmail(String mUserEmail) {
-		this.mUserEmail = mUserEmail;
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
-	public Date getmRegDate() {
-		return mRegDate;
+	public Date getRegDate() {
+		return regDate;
 	}
-	public void setmRegDate(Date mRegDate) {
-		this.mRegDate = mRegDate;
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
 	}
+	
 	@Override
 	public String toString() {
-		return "MemberVO [mId=" + mId + ", mUserId=" + mUserId + ""
-				+ ", mUserPw=" + mUserPw + ", mUserName=" + mUserName 
-				+ ", mUserEmail=" + mUserEmail + ", mRegDate=" + mRegDate + "]";
+		return "MemberVO [id=" + id + ", userId=" + userId + ", userPw=" + userPw + ", userName=" + userName
+				+ ", userEmail=" + userEmail + ", regDate=" + regDate + "]";
 	}
+	
 }

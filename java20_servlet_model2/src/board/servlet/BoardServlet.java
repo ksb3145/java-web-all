@@ -42,7 +42,7 @@ public class BoardServlet extends HttpServlet {
 	
 	protected void doProc( HttpServletRequest req, HttpServletResponse resp )
 			throws ServletException, IOException {
-		
+
 		// 한글깨짐 처리
 		req.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/html;charset-UTF-8");
@@ -50,22 +50,31 @@ public class BoardServlet extends HttpServlet {
 		// 로그인 세션체크
 		HttpSession session = req.getSession();
     	MemberVO mvo = (MemberVO) session.getAttribute("sessionVO");
-    	System.out.println("게시판 세션체크 ==> " + mvo.getmUserId());
+    	System.out.println("게시판) 세션체크 ==> " + mvo.getUserId());
 		
     	// 멀티파트 요청시 null값 처리
     	// 파일 업로드. 폼에서 가져온 인자값을 얻기 위해request 객체 전달, 업로드 경로, 파일 최대 크기, 한글처리, 파일 중복처리
-    	 // MultipartRequest multi = new MultipartRequest(request, uploadPath, size, "euc-kr", new DefaultFileRenamePolicy());
+    	// MultipartRequest multi = new MultipartRequest(request, uploadPath, size, "euc-kr", new DefaultFileRenamePolicy());
     	
 		String location = "";
 		String command = req.getParameter("command");
+		
+		System.out.println("command : "+command);
 		
 		if(command.equals("bbsList")){
 			System.out.println("게시판 리스트...");
 			
 			location= "/WEB-INF/views/board/list.jsp";
 			
+			//System.out.println(service.getBoardList());
+			req.setAttribute("boardList", service.getBBSList());
+			req.setAttribute("code", "OK");
+			req.setAttribute("msg", "게시판 조회 성공");
+			session.setAttribute("sessionVO", mvo);
+			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
+			
 		}else if(command.equals("bbsWrite")){
 			System.out.println("게시판 글쓰기..");
 			
@@ -77,31 +86,27 @@ public class BoardServlet extends HttpServlet {
 		}else if(command.equals("bbsInsert")){
 			System.out.println("게시글 등록..");
 			
-			//게시글 등록
 			String userId = req.getParameter("userId");
 			String title = req.getParameter("title");
 			String content = req.getParameter("content");
 			
-			System.out.println(userId+"/"+title+"/"+content);
-			
 			BoardVO bvo = new BoardVO();
-			bvo.setmUserId(userId);
-			bvo.setbTitle(title);
-			bvo.setbContent(content);
+			bvo.setUserId(userId);
+			bvo.setTitle(title);
+			bvo.setContent(content);
 			
-			BoardVO resultVO = service.bbsInsert(bvo);
+			BoardVO resultVO = service.setBBSInsert(bvo);
 			
 			if(null != resultVO){
-				// 가입성공
-				location = "/WEB-INF/views/board/list.jsp";
+				// 등록 성공
+				location = "/BoardServlet?command=bbsList";
 				
 				req.setAttribute("code", "OK");
-				req.setAttribute("msg", "등록 성공");
-				session.setAttribute("sessionVO", resultVO);	
+				req.setAttribute("msg", "등록 성공");	
 				
 			}else{
-				// 가입실패
-				location = "/WEB-INF/views/board/write.jsp";
+				// 등록 실패
+				location = "/BoardServlet?command=bbsWrite";
 				
 				req.setAttribute("code", "Fail");
 				req.setAttribute("msg","등록 실패!");
@@ -110,10 +115,23 @@ public class BoardServlet extends HttpServlet {
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			
+		}else if(command.equals("bbsUpdate")){
+			System.out.println("게시글 수정..");
+			
 		}else if(command.equals("bbsView")){
 			System.out.println("게시판 상세보기..");
 			
 			location= "/WEB-INF/views/board/view.jsp";
+			
+			String no = req.getParameter("no");
+			int boardId = Integer.parseInt(no);	// 게시판id
+			
+			// 게시판 상세페이지 조회
+			req.setAttribute("boardDetail", service.getBBSView(boardId));
+			req.setAttribute("code", "OK");
+			req.setAttribute("msg", "게시판 조회 성공");
+			session.setAttribute("sessionVO", mvo);
+			
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);

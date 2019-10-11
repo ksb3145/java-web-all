@@ -69,7 +69,7 @@ public class LoginServlet extends HttpServlet {
 				MemberVO mvo = service.login(userId, userPw);
 				
 				if(null != mvo){
-					location = "/WEB-INF/views/board/list.jsp";
+					location = "/BoardServlet?command=bbsList";
 					
 					req.setAttribute("code", "OK");
 					req.setAttribute("msg", "로그인 성공");
@@ -109,10 +109,10 @@ public class LoginServlet extends HttpServlet {
 				System.out.println(userId+"/"+userPw+"/"+userName+"/"+userEmail);
 				
 				MemberVO mvo = new MemberVO();
-				mvo.setmUserId(userId);
-				mvo.setmUserPw(userPw);
-				mvo.setmUserName(userName);
-				mvo.setmUserPw(userEmail);
+				mvo.setUserId(userId);
+				mvo.setUserPw(userPw);
+				mvo.setUserName(userName);
+				mvo.setUserEmail(userEmail);
 				
 				MemberVO resultVO = service.join(mvo);
 				

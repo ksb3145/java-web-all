@@ -1,14 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <jsp:include page="../common/header.jsp" flush="false"></jsp:include>
-	
-	
 	<div class="row">
-	
-	
 		<div class="col-md-12">
 			<h4>List</h4>
-			
 			<div class="card-deck mb-3 text-center">
 				<div class="card md-4 shadow-sm">
 					<div class="card-body ">
@@ -34,6 +29,7 @@
 			</div>
 			
 			
+			
 			<table class="table table-bordered">
 				<tr>
 					<td>번호</td>
@@ -41,36 +37,18 @@
 					<td>작성자</td>
 					<td>작성일</td>
 				</tr>
-				<tr>
-					<td>1</td>
-					<td>글올립니다</td>
-					<td>홍길동</td>
-					<td>0000-00-00 00:00:00</td>
-				</tr>
-				<tr>
-					<td>2</td>
-					<td>글올립니다</td>
-					<td>홍길동</td>
-					<td>0000-00-00 00:00:00</td>
-				</tr>
-				<tr>
-					<td>3</td>
-					<td>글올립니다</td>
-					<td>홍길동</td>
-					<td>0000-00-00 00:00:00</td>
-				</tr>
-				<tr>
-					<td>4</td>
-					<td>글올립니다</td>
-					<td>홍길동</td>
-					<td>0000-00-00 00:00:00</td>
-				</tr>
-				<tr>
-					<td>5</td>
-					<td>글올립니다</td>
-					<td>홍길동</td>
-					<td>0000-00-00 00:00:00</td>
-				</tr>
+				
+				
+				
+				<c:forEach var="obj" items="${boardList}">
+					<tr>
+						<td>${obj.id}</td>
+						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}">${obj.title}</a></td>
+						<td>${obj.userId}</td>
+						<td>${obj.regDate}</td>
+					</tr>
+				</c:forEach>
+				
 			</table>
 			
 		</div>

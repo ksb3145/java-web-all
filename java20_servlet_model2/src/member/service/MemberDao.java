@@ -28,16 +28,16 @@ public class MemberDao {
 	// 회원등록
 	public void insertMember( MemberVO mvo ){
 		//쿼리문
-		String sql = "insert into mvc_member (mUserId, mUserPw, mUserName, mUserEmail, mRegdate) values (?,?,?,?,now())";
+		String sql = "insert into mvc_member (mUserId, mUserPw, mUserName, mUserEmail, mRegdate) values (?,?,?,?,now());";
 		
 		PreparedStatement pstmt = null;
 		try{	
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1, mvo.getmUserId());
-			pstmt.setString(2, mvo.getmUserPw());
-			pstmt.setString(3, mvo.getmUserName());
-			pstmt.setString(4, mvo.getmUserEmail());
+			pstmt.setString(1, mvo.getUserId());
+			pstmt.setString(2, mvo.getUserPw());
+			pstmt.setString(3, mvo.getUserName());
+			pstmt.setString(4, mvo.getUserEmail());
 			
 			pstmt.executeUpdate();
 			
@@ -45,7 +45,8 @@ public class MemberDao {
 			e.printStackTrace();
 		} finally {
 			try {
-				if( pstmt != null && !pstmt.isClosed() );
+				if( pstmt != null && !pstmt.isClosed() )
+					pstmt.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
 			}
@@ -67,11 +68,11 @@ public class MemberDao {
 			
 			if( rs.next() ){
 				mvo = new MemberVO();
-				mvo.setmId( rs.getInt("mId") );
-				mvo.setmUserId( rs.getString("mUserId") );
-				mvo.setmUserPw( rs.getString("mUserPw") );
-				mvo.setmUserName( rs.getString("mUserName") );
-				mvo.setmUserEmail( rs.getString("mUserEmail") );
+				mvo.setId( rs.getInt("mId") );
+				mvo.setUserId( rs.getString("mUserId") );
+				mvo.setUserPw( rs.getString("mUserPw") );
+				mvo.setUserName( rs.getString("mUserName") );
+				mvo.setUserEmail( rs.getString("mUserEmail") );
 			}
 			
 		} catch ( SQLException e ) {

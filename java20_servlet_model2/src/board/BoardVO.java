@@ -1,56 +1,55 @@
 package board;
 
+import java.util.Date;
+
 public class BoardVO {
 	
-	private int bId;
-	private String mUserId;
-	private String bTitle;
-	private String bContent;
-	private int bHit;
-	private String bRegDate;
-	public int getbId() {
-		return bId;
+	private int id;
+	private String userId;
+	private String title;
+	private String content;
+	private int hit;
+	private Date regDate;
+	public int getId() {
+		return id;
 	}
-	public void setbId(int bId) {
-		this.bId = bId;
+	public void setId(int id) {
+		this.id = id;
 	}
-	public String getmUserId() {
-		return mUserId;
+	public String getUserId() {
+		return userId;
 	}
-	public void setmUserId(String mUserId) {
-		this.mUserId = mUserId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	public String getbTitle() {
-		return bTitle;
+	public String getTitle() {
+		return title;
 	}
-	public void setbTitle(String bTitle) {
-		this.bTitle = bTitle;
+	public void setTitle(String title) {
+		this.title = title;
 	}
-	public String getbContent() {
-		return bContent;
+	public String getContent() {
+		return content;
 	}
-	public void setbContent(String bContent) {
-		this.bContent = bContent;
+	public void setContent(String content) {
+		this.content = content;
 	}
-	public int getbHit() {
-		return bHit;
+	public int getHit() {
+		return hit;
 	}
-	public void setbHit(int bHit) {
-		this.bHit = bHit;
+	public void setHit(int hit) {
+		this.hit = hit;
 	}
-	public String getbRegDate() {
-		return bRegDate;
+	public Date getRegDate() {
+		return regDate;
 	}
-	public void setbRegDate(String bRegDate) {
-		this.bRegDate = bRegDate;
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
 	}
-	
-	
 	@Override
 	public String toString() {
-		return "BoardVO [bId=" + bId + ", mUserId=" + mUserId + ", bTitle=" + bTitle + ", bContent=" + bContent
-				+ ", bHit=" + bHit + ", bRegDate=" + bRegDate + "]";
+		return "BoardVO [id=" + id + ", userId=" + userId + ", title=" + title + ", content=" + content + ", hit=" + hit
+				+ ", regDate=" + regDate + "]";
 	}
-	
 	
 }

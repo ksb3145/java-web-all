@@ -9,7 +9,9 @@
 
 <link rel="stylesheet" href="css/common.css">
 <link rel="stylesheet" href="css/bootstrap.css">
-
+<!-- 스크립트 선언 -->
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
 
 <title>상단</title>
 </head>

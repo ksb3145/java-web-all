@@ -92,6 +92,7 @@
 
 <script>
     $('#commentSubmit').click(function(){
+
     	var url = "/CommentServlet";
     	var command = $("#command").val();
     	var boardId = $("#boardId").val();
@@ -100,12 +101,12 @@
     	var data = { command: command, boardId: boardId, userId: userId, comment: comment };
     	var result;
     	
-    	result = callAjax(data, url);
-    	
-    	console.log(result);
+		callAjax(data, url);
     });
     
     function callAjax(data, url){
+    	console.log("ff");
+    	
     	$.ajax({
 			url:url,
 		    async:true,
@@ -115,14 +116,21 @@
 		    beforeSend:function(jqXHR) {
 		    // 서버 요청 전 호출 되는 함수 return false; 일 경우 요청 중단
 		    },
-		    success:function(jqXHR) {
-		    // 요청 완료 시	
-		    	return jqXHR;
+		    success:function(resultData) {
+		    // 요청 완료 시
+			    console.log(resultData);
+		    	if(resultData.resultCode == "OK"){
+		    		alert("정상적으로 등록되었습니다.");
+		    	}else{
+		    		alert("등록실패 다시시도하세요.");		    		
+		    	}
+		    	
+		    	location.reload();
 		    },
-		    error:function(jqXHR) {
-		    // 요청 실패.
-		    	return jqXHR;
-		    }
+		    error:function(request,status,error){
+		    	alert("등록실패 다시시도하세요.");
+			   console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			}
         });	
     }
 </script>

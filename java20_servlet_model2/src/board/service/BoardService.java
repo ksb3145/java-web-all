@@ -15,14 +15,14 @@ public class BoardService {
 	}
 	
 	public BoardVO setBBSInsert(BoardVO bvo){
-//		MemberVO mvo = memberDao.selectOne(bvo.getmUserId());
-//		
-//		if (null != mvo){
+		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
+		
+		if (null != mvo){
 			boardDao.insertBoard(bvo);
 			return bvo;
-//		}else{
-//			return null;
-//		}
+		}else{
+			return null;
+		}
 	}
 	
 	// 게시판 리스트

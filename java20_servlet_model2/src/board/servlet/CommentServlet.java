@@ -1,6 +1,7 @@
 package board.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,6 +14,7 @@ import board.BoardVO;
 import board.CommentVO;
 import board.service.CommentService;
 import member.vo.MemberVO;
+import net.sf.json.JSONObject;
 
 public class CommentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -49,52 +51,44 @@ public class CommentServlet extends HttpServlet {
 		if(command.equals("commentInsert")){
 			System.out.println("코벤트 등록..");
 			
+			String boardId = req.getParameter("boardId");	// 코멘트의 부모글
+			int gorup = Integer.parseInt(boardId);			// 캐스팅..
 			
-			String boardId = req.getParameter("boardId");	//코멘트의 부모글
-			int gorup = Integer.parseInt(boardId);
-			
+			// 선언과 값 할당
 			String userId = req.getParameter("userId");
 			String comment = req.getParameter("comment");
 			
-			
 			System.out.println(boardId +"/"+ userId +"/"+ comment);
+			
+			// 바인딩시킬 코멘트 객체 생성..
 			CommentVO cvo = new CommentVO();
+			
 			cvo.setGroup(gorup);
 			cvo.setUserId(userId);
 			cvo.setComment(comment);
-			
-			System.out.println(cvo.toString());
-			
-			CommentServlet cs = new CommentServlet();
-			cs.ajaxResult(cvo);
 			
 			// 코멘트테이블에 부모글key값 있는지 확인(등록된 코멘트확인)
 			// 없으면 depth = 0, sort = 1
 			// 있으면 depth = 0, sort = 2
 			// 댓글에 댓글이면 depth = 1, sort = 1
 			
-//			if(null != resultVO){
-//				// 등록 성공
-//				location = "/BoardServlet?command=bbsList";
-//				
-//				req.setAttribute("code", "OK");
-//				req.setAttribute("msg", "등록 성공");	
-//				
-//			}else{
-//				// 등록 실패
-//				location = "/BoardServlet?command=bbsWrite";
-//				
-//				req.setAttribute("code", "Fail");
-//				req.setAttribute("msg","등록 실패!");
-//			}
 			
-			//RequestDispatcher rd = req.getRequestDispatcher(location);
-			//rd.forward(req, resp);
+			// JSONObject는 HashMap을 상속
+			JSONObject json = new JSONObject(); 
+			
+			json.put("resultCode", "OK");
+			json.put("gorup", gorup);
+		    json.put("userId", userId);
+		    json.put("comment", comment);
+		    
+		    // 헤더설정
+		    resp.setContentType("application/json");
+		    resp.setCharacterEncoding("UTF-8");
+		    
+		    PrintWriter out = resp.getWriter();
+		    out.print(json);
 		}
 	}
 	
-	// ajax 결과 반환
-	public Object ajaxResult(Object obj){
-		return obj;
-	}
+	
 }

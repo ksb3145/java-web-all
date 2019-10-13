@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import board.BoardVO;
+import board.CommentVO;
 import board.service.CommentService;
 import member.vo.MemberVO;
 
@@ -40,11 +41,6 @@ public class CommentServlet extends HttpServlet {
 		req.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/html;charset-UTF-8");
 		
-		// 로그인 세션체크
-		HttpSession session = req.getSession();
-    	MemberVO mvo = (MemberVO) session.getAttribute("sessionVO");
-    	System.out.println("게시판) 세션체크 ==> " + mvo.getUserId());
-
 		String location = "";
 		String command = req.getParameter("command");
 		
@@ -53,10 +49,29 @@ public class CommentServlet extends HttpServlet {
 		if(command.equals("commentInsert")){
 			System.out.println("코벤트 등록..");
 			
-			String userId = req.getParameter("userId");
-			String title = req.getParameter("title");
-			String content = req.getParameter("content");
 			
+			String boardId = req.getParameter("boardId");	//코멘트의 부모글
+			int gorup = Integer.parseInt(boardId);
+			
+			String userId = req.getParameter("userId");
+			String comment = req.getParameter("comment");
+			
+			
+			System.out.println(boardId +"/"+ userId +"/"+ comment);
+			CommentVO cvo = new CommentVO();
+			cvo.setGroup(gorup);
+			cvo.setUserId(userId);
+			cvo.setComment(comment);
+			
+			System.out.println(cvo.toString());
+			
+			CommentServlet cs = new CommentServlet();
+			cs.ajaxResult(cvo);
+			
+			// 코멘트테이블에 부모글key값 있는지 확인(등록된 코멘트확인)
+			// 없으면 depth = 0, sort = 1
+			// 있으면 depth = 0, sort = 2
+			// 댓글에 댓글이면 depth = 1, sort = 1
 			
 //			if(null != resultVO){
 //				// 등록 성공
@@ -73,8 +88,13 @@ public class CommentServlet extends HttpServlet {
 //				req.setAttribute("msg","등록 실패!");
 //			}
 			
-			RequestDispatcher rd = req.getRequestDispatcher(location);
-			rd.forward(req, resp);
+			//RequestDispatcher rd = req.getRequestDispatcher(location);
+			//rd.forward(req, resp);
 		}
+	}
+	
+	// ajax 결과 반환
+	public Object ajaxResult(Object obj){
+		return obj;
 	}
 }

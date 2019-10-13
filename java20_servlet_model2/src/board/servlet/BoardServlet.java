@@ -47,11 +47,6 @@ public class BoardServlet extends HttpServlet {
 		req.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/html;charset-UTF-8");
 		
-		// 로그인 세션체크
-		HttpSession session = req.getSession();
-    	MemberVO mvo = (MemberVO) session.getAttribute("sessionVO");
-    	System.out.println("게시판) 세션체크 ==> " + mvo.getUserId());
-		
     	// 멀티파트 요청시 null값 처리
     	// 파일 업로드. 폼에서 가져온 인자값을 얻기 위해request 객체 전달, 업로드 경로, 파일 최대 크기, 한글처리, 파일 중복처리
     	// MultipartRequest multi = new MultipartRequest(request, uploadPath, size, "euc-kr", new DefaultFileRenamePolicy());
@@ -70,7 +65,6 @@ public class BoardServlet extends HttpServlet {
 			req.setAttribute("boardList", service.getBBSList());
 			req.setAttribute("code", "OK");
 			req.setAttribute("msg", "게시판 조회 성공");
-			session.setAttribute("sessionVO", mvo);
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
@@ -130,7 +124,6 @@ public class BoardServlet extends HttpServlet {
 			req.setAttribute("boardDetail", service.getBBSView(boardId));
 			req.setAttribute("code", "OK");
 			req.setAttribute("msg", "게시판 조회 성공");
-			session.setAttribute("sessionVO", mvo);
 			
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);

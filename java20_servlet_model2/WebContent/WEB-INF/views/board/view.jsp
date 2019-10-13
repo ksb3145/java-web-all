@@ -5,7 +5,7 @@
 	<div class="row">
 	
 		<div class="col-md-12">
-			<input type="hidden" id="userId" name="userId" value="${sessionVO.mUserId}" />
+			<input type="hidden" id="userId" name="userId" value="${sessionVO.userId}" />
 			<h4>상세보기</h4>
 
 			<table class="table table-bordered">
@@ -42,7 +42,7 @@
 						<a href="/BoardServlet?command=bbsList" class="btn btn-primary">목록</a>
 					</li>
 					<li class="float-r">
-						<c:if test="${sessionVO.mUserId} eq ${boardDetail.userId}">
+						<c:if test="${sessionVO.userId} eq ${boardDetail.userId}">
 							<button type="submit" class="btn btn-warning">수정</button>
 						        <button type="submit" class="btn btn-warning">삭제</button>
 						</c:if>
@@ -54,7 +54,9 @@
 			
 			<form class="form-horizontal" action="/BoardServlet" method="post" >
 				<input type="text" id="command" name="command" value="commentInsert" />
-				<input type="text" id="id" name="id" value="${boardDetail.id}" />
+				<input type="text" id="boardId" name="boardId" value="${boardDetail.id}" />
+				<input type="text" id="userId" name="userId" value="${sessionVO.userId}" />
+				
 				<div class="card-deck mb-3">
 					<div class="card md-4 shadow-sm">
 						<div class="card-header">
@@ -62,11 +64,11 @@
 								<ul class="list-inline">
 									<li class="col-md-11">
 										<div class="form-group">
-											<input type="text" class="form-control" id="exampleInputName2" placeholder="comment...">
+											<input type="text" class="form-control" id="comment" name="comment" placeholder="comment...">
 										</div>
 									</li>
 									<li class="col-md-1 float-r">
-								        <button type="button" id="execute" class="btn btn-warning">등록</button>
+								        <button type="button" id="commentSubmit" class="btn btn-warning" data-depth="0" >등록</button>
 									</li>
 								</ul>
 							</form>
@@ -89,20 +91,40 @@
 
 
 <script>
-    $('#execute').click(function(){
-    	alert("re");
+    $('#commentSubmit').click(function(){
+    	var url = "/CommentServlet";
+    	var command = $("#command").val();
+    	var boardId = $("#boardId").val();
+    	var userId 	= $("#userId").val();
+    	var comment = $("#comment").val();
+    	var data = { command: command, boardId: boardId, userId: userId, comment: comment };
+    	var result;
     	
-    	var boardId = $("#");
-    	var commentDepth = $("#");
+    	result = callAjax(data, url);
     	
-    	
-       /*  $.ajax({
-            url:'./time.php',
-            success:function(data){
-                $('#time').append(data);
-            }
-        }) */
-    })
+    	console.log(result);
+    });
+    
+    function callAjax(data, url){
+    	$.ajax({
+			url:url,
+		    async:true,
+		    type:'POST',
+		    data: data,
+		    dataType:'json',
+		    beforeSend:function(jqXHR) {
+		    // 서버 요청 전 호출 되는 함수 return false; 일 경우 요청 중단
+		    },
+		    success:function(jqXHR) {
+		    // 요청 완료 시	
+		    	return jqXHR;
+		    },
+		    error:function(jqXHR) {
+		    // 요청 실패.
+		    	return jqXHR;
+		    }
+        });	
+    }
 </script>
 	
 <jsp:include page="../common/footer.jsp" flush="false"></jsp:include>

@@ -21,6 +21,7 @@
     <servlet-name>Login</servlet-name>
     <url-pattern>/loginServlet</url-pattern>
   </servlet-mapping>
+  
   <servlet>
     <servlet-name>Board</servlet-name>
     <servlet-class>board.servlet.BoardServlet</servlet-class>
@@ -28,6 +29,14 @@
   <servlet-mapping>
     <servlet-name>Board</servlet-name>
     <url-pattern>/BoardServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>Comment</servlet-name>
+    <servlet-class>board.servlet.CommentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Comment</servlet-name>
+    <url-pattern>/CommentServlet</url-pattern>
   </servlet-mapping>
   
   <!-- <error-page>

@@ -68,7 +68,7 @@
 										</div>
 									</li>
 									<li class="col-md-1 float-r">
-								        <button type="button" class="commentSubmit" id="commentSubmit"  class="btn btn-warning" data-depth="0" >등록</button>
+								        <button type="button" class="commentSubmit" id="commentSubmit"  class="btn btn-warning" data-cmtdepth="0" data-cmtsort="1" >등록</button>
 									</li>
 								</ul>
 							</form>
@@ -113,20 +113,22 @@
 		$(document).on("click",".commentSubmit",function(e){
 			var result, comment;
 			
-	    	var url = "/CommentServlet";
-	    	var command = $("#command").val();
+	    	var url 		= "/CommentServlet";
+	    	var command 	= $("#command").val();
 	    	
-	    	var boardId = $("#boardId").val();
-	    	var userId 	= $("#userId").val();
-	    	var depth 	= $(this).data("depth");
+	    	var boardId 	= $("#boardId").val();
+	    	var userId 		= $("#userId").val();
+	    	var cmtDepth 	= $(this).data("cmtdepth");
+	    	var cmtSort 	= $(this).data("cmtsort");
 
-	    	if(depth == 0){
+
+	    	if(cmtDepth == 0){
 	    		comment = $("#comment").val();
 	    	}else{
 	    		comment = $("#reCommentInput").val();
 	    	}
 	    	
-	    	var data = { command: command, boardId: boardId, userId: userId, comment: comment, depth: depth };
+	    	var data = { command: command, boardId: boardId, userId: userId, comment: comment, cmtDepth: cmtDepth, cmtSort: cmtDepth };
 
 	    	//console.log(data);
 	    	
@@ -139,14 +141,15 @@
 			reCommentClose();
 			
 			// 상위 dl 태그
-			var reDepth	= $(this).attr("data-reDepth");
-			var parent	= $(this).parents("dl");
+			var cmtDepth	= $(this).attr("data-cmtdepth");
+			var cmtSort		= $(this).attr("data-cmtsort");
+			var parent		= $(this).parents("dl");
 			
 			//var findTag = parent.parents("ul").find("#addReCommentInput").text();
 			
 			var html  = "<dd id='addReCommentInput'>";
 				html += "	<input type='text' id='reCommentInput' name='reCommentInput' />";
-				html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-depth='"+reDepth+"'>등록</button>";
+				html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-cmtdepth='"+cmtDepth+"' data-cmtsort='"+cmtSort+"'>등록</button>";
 				html += "	<button type='button' onClick='reCommentClose();'>닫기</button>";
 				html += "</dd>";
 
@@ -179,7 +182,7 @@
 		    		alert("등록실패 다시시도하세요.");		    		
 		    	}
 		    	
-		    	//location.reload();
+		    	location.reload();
 		    },
 		    error:function(request,status,error){
 		    	alert("등록실패 다시시도하세요.");

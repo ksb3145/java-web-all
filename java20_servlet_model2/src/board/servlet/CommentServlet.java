@@ -51,21 +51,26 @@ public class CommentServlet extends HttpServlet {
 		if(command.equals("commentInsert")){
 			System.out.println("코벤트 등록..");
 			
-			String boardId = req.getParameter("boardId");	// 코멘트의 부모글
-			int gorup = Integer.parseInt(boardId);			// 캐스팅..
+			String boardId  = req.getParameter("boardId");	// 코멘트의 부모글
+			String userId 	= req.getParameter("userId");
+			String comment 	= req.getParameter("comment");
+			String cmtDepth = req.getParameter("cmtDepth");
+			String cmtSort 	= req.getParameter("cmtSort");
+			// 캐스팅..
+			int CmtGroup 	= Integer.parseInt(boardId);
+			int depth 		= Integer.parseInt(cmtDepth);
+			int sort 		= Integer.parseInt(cmtSort);
 			
-			// 선언과 값 할당
-			String userId = req.getParameter("userId");
-			String comment = req.getParameter("comment");
-			
-			System.out.println(boardId +"/"+ userId +"/"+ comment);
+			System.out.println( userId +"/"+ comment +"/"+ depth +"/"+ sort +"/"+ CmtGroup);
 			
 			// 바인딩시킬 코멘트 객체 생성..
 			CommentVO cvo = new CommentVO();
 			
-			cvo.setGroup(gorup);
+			cvo.setCmtGroup(CmtGroup);
 			cvo.setUserId(userId);
-			cvo.setComment(comment);
+			cvo.setContents(comment);
+			cvo.setDepth(depth);
+			cvo.setSort(sort);
 			
 			service.setCommentInsert(cvo);
 			
@@ -78,7 +83,7 @@ public class CommentServlet extends HttpServlet {
 			JSONObject json = new JSONObject(); 
 			
 			json.put("resultCode", "OK");
-			json.put("gorup", gorup);
+			json.put("gorup", CmtGroup);
 		    json.put("userId", userId);
 		    json.put("comment", comment);
 		    

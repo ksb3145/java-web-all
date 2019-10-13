@@ -27,7 +27,7 @@ public class CommentDao {
 	//코멘트 등록
 	public void insertComment(CommentVO cvo){
 		
-		String sql = "insert into mvc_comment (cGroup, cSort, cDepth, cComment, mUserId, cRegdate) value (?,?,?,?,?,now());";
+		String sql = "INSERT INTO mvc_comment (group, sort, depth, comment, mUserId, regdate) VALUES (?, ?, ?, ?, ?, now());";
 		
 		System.out.println(sql);
 		
@@ -41,6 +41,7 @@ public class CommentDao {
 			pstmt.setInt(3, cvo.getDepth());
 			pstmt.setString(4, cvo.getComment());
 			pstmt.setString(5, cvo.getUserId());
+			
 			pstmt.executeUpdate();
 			
 		}catch( SQLException e ) {

@@ -68,45 +68,99 @@
 										</div>
 									</li>
 									<li class="col-md-1 float-r">
-								        <button type="button" id="commentSubmit" class="btn btn-warning" data-depth="0" >등록</button>
+								        <button type="button" class="commentSubmit" id="commentSubmit"  class="btn btn-warning" data-depth="0" >등록</button>
 									</li>
 								</ul>
 							</form>
 						</div>
 						<div class="card-body ">
-							<dl class="dl-horizontal">
-							  <dt>aaa님</dt>
-							  <dd>안녕하세요~</dd>
-							</dl>
+							<ul>
+								<li>
+									<dl class="dl-horizontal">
+										<dt>
+											aaa님
+											<span class="reComment" data-reDepth="1">댓글</span>									  		
+										</dt>
+										<dd>안녕하세요~</dd>
+
+									</dl>
+
+								</li>
+								<li>
+									<dl class="dl-horizontal">
+										<dt>
+											aaa2님
+											<span class="reComment" data-reDepth="1">댓글</span>
+										</dt>
+										<dd>안녕하세요~2</dd>
+										
+									</dl>
+								</li>
+							</ul>
+							
 						</div>
 					</div>
 				</div>
 				
 			</form>
 		</div>
-		
-		
-		
+				
 	</div>
 
-
 <script>
-    $('#commentSubmit').click(function(){
+	$(document).ready(function() {
+		// 원글->코멘트
+		$(document).on("click",".commentSubmit",function(e){
+			var result, comment;
+			
+	    	var url = "/CommentServlet";
+	    	var command = $("#command").val();
+	    	
+	    	var boardId = $("#boardId").val();
+	    	var userId 	= $("#userId").val();
+	    	var depth 	= $(this).data("depth");
 
-    	var url = "/CommentServlet";
-    	var command = $("#command").val();
-    	var boardId = $("#boardId").val();
-    	var userId 	= $("#userId").val();
-    	var comment = $("#comment").val();
-    	var data = { command: command, boardId: boardId, userId: userId, comment: comment };
-    	var result;
-    	
-		callAjax(data, url);
-    });
-    
+	    	if(depth == 0){
+	    		comment = $("#comment").val();
+	    	}else{
+	    		comment = $("#reCommentInput").val();
+	    	}
+	    	
+	    	var data = { command: command, boardId: boardId, userId: userId, comment: comment, depth: depth };
+
+	    	//console.log(data);
+	    	
+			callAjax(data, url);
+
+		});
+		
+		//코멘트->코멘트
+		$(".reComment").on("click",function(e){
+			reCommentClose();
+			
+			// 상위 dl 태그
+			var reDepth	= $(this).attr("data-reDepth");
+			var parent	= $(this).parents("dl");
+			
+			//var findTag = parent.parents("ul").find("#addReCommentInput").text();
+			
+			var html  = "<dd id='addReCommentInput'>";
+				html += "	<input type='text' id='reCommentInput' name='reCommentInput' />";
+				html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-depth='"+reDepth+"'>등록</button>";
+				html += "	<button type='button' onClick='reCommentClose();'>닫기</button>";
+				html += "</dd>";
+
+			parent.append(html);
+
+		});
+	});
+	
+	function reCommentClose(){
+		$("#addReCommentInput").remove();
+	}
+
+	
     function callAjax(data, url){
-    	console.log("ff");
-    	
     	$.ajax({
 			url:url,
 		    async:true,
@@ -125,7 +179,7 @@
 		    		alert("등록실패 다시시도하세요.");		    		
 		    	}
 		    	
-		    	location.reload();
+		    	//location.reload();
 		    },
 		    error:function(request,status,error){
 		    	alert("등록실패 다시시도하세요.");

@@ -67,9 +67,10 @@ public class CommentServlet extends HttpServlet {
 			cvo.setUserId(userId);
 			cvo.setComment(comment);
 			
-			// 코멘트테이블에 부모글key값 있는지 확인(등록된 코멘트확인)
-			// 없으면 depth = 0, sort = 1
-			// 있으면 depth = 0, sort = 2
+			service.setCommentInsert(cvo);
+			
+			// 댓글 없으면 depth = 0, sort = 1
+			// 댓글 있으면 depth = 0, sort = 2
 			// 댓글에 댓글이면 depth = 1, sort = 1
 			
 			

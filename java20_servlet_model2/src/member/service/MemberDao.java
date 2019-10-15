@@ -28,7 +28,7 @@ public class MemberDao {
 	// 회원등록
 	public void insertMember( MemberVO mvo ){
 		//쿼리문
-		String sql = "insert into mvc_member (mUserId, mUserPw, mUserName, mUserEmail, mRegdate) values (?,?,?,?,now());";
+		String sql = "insert into mvc_member (mUserId, mUserPw, mUserName, mUserEmail) values (?,?,?,?);";
 		
 		PreparedStatement pstmt = null;
 		try{	

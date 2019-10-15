@@ -30,7 +30,7 @@ public class CommentDao {
 	
 	//코멘트 등록
 	public int insertComment(CommentVO cvo){
-		String sql = "INSERT INTO mvc_comment (bId, cmtGroup, sort, depth, contents, mUserId, regdate) VALUES (?, ?, ?, ?, ?, ?, now());";
+		String sql = "INSERT INTO mvc_comment (bId, cmtGroup, sort, depth, contents, mUserId) VALUES (?, ?, ?, ?, ?, ?);";
 		
 		int result = 0;
 		PreparedStatement pstmt = null;
@@ -105,7 +105,7 @@ public class CommentDao {
 	
 	// 코멘트 리스트
 	public List<CommentVO> selectComment(int bId){
-		String sql = "SELECT cId, bid, cmtGroup, sort, depth, contents, mUserId, regdate FROM mvc_comment WHERE delYN='N' AND bid = "+bId+" ORDER BY cmtGroup ASC, regdate ASC;";
+		String sql = "SELECT cId, bid, cmtGroup, sort, depth, contents, mUserId, regdate FROM mvc_comment WHERE delYN='N' AND bid = "+bId+" ORDER BY cmtGroup ASC, depth ASC, regdate ASC;";
 		
 		PreparedStatement pstmt = null;
 		//결과 탐색

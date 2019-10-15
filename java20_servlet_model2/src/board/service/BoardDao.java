@@ -34,7 +34,7 @@ public class BoardDao {
 	public int insertBoard(BoardVO bvo){
 		int result = 0;
 		
-		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent, bRegDate) VALUES ( ?, ?, ?, now() );";
+		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent) VALUES ( ?, ?, ?);";
 		
 		PreparedStatement pstmt = null;
 		try{	
@@ -99,13 +99,17 @@ public class BoardDao {
 		int rownum =0 , limit = 0;
 		String where = "";
 
-		if(params.get("offset") != "") rownum = (int)params.get("offset")+1;
-		if(params.get("limit") != "") limit = (int)params.get("limit");
+		if(params.get("offset") != "") rownum = (int)params.get("offset");
+		if(params.get("limit") != "") limit = (int)params.get("limit")*(int)params.get("page");
+		
+		int bNo = rownum-1;
+		if(0>bNo) bNo = 0;
 		
 		sql  = "SELECT B.* ";
 		sql += "FROM mvc_board B ";
-		sql += "WHERE (@rownum:="+rownum+")="+rownum+" AND "+(rownum-1)+"<bId ";
+		sql += "WHERE (@rownum:="+rownum+")="+rownum+" AND "+ bNo +"<bId ";
 		sql += where;
+		sql += "ORDER BY bRegdate DESC ";
 		sql += "LIMIT "+limit;
 		
 		

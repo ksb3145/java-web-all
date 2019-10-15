@@ -87,7 +87,7 @@
 				<input type="hidden" id="command" name="command" value="commentInsert" />
 				<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
 				<input type="hidden" id="userId" name="userId" value="${sessionVO.userId}" />
-				
+
 				<div class="card-deck mb-3">
 					<div class="card md-4 shadow-sm">
 						<div class="card-header">
@@ -122,8 +122,10 @@
 											</dt>
 											<dd>
 												${obj.userId} <span class="date">${obj.regdate}</span>
-												<span class="reComment btn sm black" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>	
-												<span class="delBtn btn sm red mgReset" data-cid="${obj.cId}" data-command="cmtDelete">삭제</span>
+												<c:if test="${sessionVO.userId == obj.userId}">	
+												<span class="delBtn btn sm red" data-cid="${obj.cId}" data-command="cmtDelete">삭제</span>
+												</c:if>
+												<span class="reComment btn sm black mgReset" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>
 												<p>${obj.contents}</p>  	
 											</dd>
 										</dl>
@@ -147,13 +149,13 @@
 		$(document).on("click",".commentSubmit",function(e){
 			var comment;
 			
-	    	var url 			= "/CommentServlet";
+	    	var url 		= "/CommentServlet";
 	    	var command 	= $("#command").val();
-	    	var boardId 		= $("#boardId").val();
+	    	var boardId 	= $("#boardId").val();
 	    	var userId 		= $("#userId").val();
 	    	var cmtGroup 	= $(this).data("cmtgroup");
 	    	var cmtDepth 	= $(this).data("cmtdepth");
-	    	var cmtSort 		= $(this).data("cmtsort");
+	    	var cmtSort 	= $(this).data("cmtsort");
 
 
 	    	if(cmtDepth == 0){
@@ -195,18 +197,13 @@
 		$(".delBtn").on("click",function(e){
 			var command = $(this).attr("data-command");
 			var url;
-	    	var boardId;
-	    	var userId;
+	    	var boardId = $("#boardId").val();
+	    	var userId 	= $("#userId").val();
 	    	
-			if(command == ""){
-				url = "/BoardServlet";
-		    	var boardId 	= $("#boardId").val();
-		    	var userId 		= $("#userId").val();	
+			if(command == "bbsDelete"){
+				url = "/BoardServlet";	
 			}else if(command == ""){
-				var url 		= "/BoardServlet";
-		    	var boardId 	= $("#boardId").val();
-		    	var userId 		= $("#userId").val();
-				
+				url	= "/BoardServlet";
 			}
 			
 			

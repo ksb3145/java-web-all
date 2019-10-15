@@ -5,8 +5,9 @@ import java.util.Date;
 public class CommentVO {
 	
 	public int cId;			// 댓글 키값
-	public int cmtGroup; 	// 댓글 부모값
-	public int sort;		// 댓글 순서
+	public int bId;			// 게시글 키
+	public int cmtGroup; 	// 댓글 그룹
+	public int sort;			// 댓글 순서
 	public int depth;		// 댓글 깊이 (댓글, 댓글의 댓글 ..)
 	public String contents; // 댓글 내용
 	public String userId; 	// 댓글 작성자
@@ -17,6 +18,12 @@ public class CommentVO {
 	}
 	public void setcId(int cId) {
 		this.cId = cId;
+	}
+	public int getbId() {
+		return bId;
+	}
+	public void setbId(int bId) {
+		this.bId = bId;
 	}
 	public int getCmtGroup() {
 		return cmtGroup;
@@ -55,10 +62,11 @@ public class CommentVO {
 	public void setRegdate(Date regdate) {
 		this.regdate = regdate;
 	}
-	
 	@Override
 	public String toString() {
-		return "CommentVO [cId=" + cId + ", cmtGroup=" + cmtGroup + ", sort=" + sort + ", depth=" + depth + ", contents="
-				+ contents + ", userId=" + userId + ", regdate=" + regdate + "]";
+		return "CommentVO [cId=" + cId + ", bId=" + bId + ", cmtGroup="
+				+ cmtGroup + ", sort=" + sort + ", depth=" + depth
+				+ ", contents=" + contents + ", userId=" + userId
+				+ ", regdate=" + regdate + "]";
 	}
 }

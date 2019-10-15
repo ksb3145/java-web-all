@@ -1,13 +1,45 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <jsp:include page="../common/header.jsp" flush="false"></jsp:include>
+
+
+<style>
+/*공통*/
+	body { font-size: 15px; }
+	ul { list-style: none; padding: 0; }
+	button:not(:disabled), 
+	[type='button']:not(:disabled), 
+	[type='reset']:not(:disabled), 
+	[type='submit']:not(:disabled),
+	span.btn { cursor: pointer; }
+	/* 마진,패딩 값 초기화 */
+	.mgReset { margin: 0px !important; }
+	.pdReset { padding: 0px !important; }
+	
+	/*버튼*/
+	.sm { font-size: 10px; padding: 3px 5px; }
+	.md { font-size: 13px; padding: 5px 10px; }
+	.lg { font-size: 15px; padding: 5px 10px; }
+	.btn { vertical-align: middle; border-radius: 5px;   font-weight: bold; }
+	.black { background: #333; color: #fff; }
+	.gray { background: gray; color: #fff; }
+	.red { background: red; color: #fff; }
+	.green { background: green; color: #fff; }
+	.btn:hover { background: yellow; color: #333; border:1px solid #eee; }
+	
+	/*코멘트*/
+	.commentArea li:first-child { border-top: none;  }
+	.commentArea li { border-top: 1px solid rgba(0, 0, 0, 0.125);  }
+	.reComment.btn { margin-left: 10px; }
+	
+	.commentArea span.date { font-size: 11px; color: gray; padding-left: 5px; }
+	.commentArea p { margin-bottom: 5px; }
+</style>
 	
 	<div class="row">
 	
 		<div class="col-md-12">
-			<input type="hidden" id="userId" name="userId" value="${sessionVO.userId}" />
 			<h4>상세보기</h4>
-
 			<table class="table table-bordered">
 				<colgroup>
 					<col width="10%" />
@@ -39,23 +71,22 @@
 			<div class="col-md-12">
 				<ul class="list-inline">
 					<li>
-						<a href="/BoardServlet?command=bbsList" class="btn btn-primary">목록</a>
+						<a href="/BoardServlet?command=bbsList" class="btn lg gray">목록</a>
 					</li>
 					<li class="float-r">
-						<c:if test="${sessionVO.userId} eq ${boardDetail.userId}">
-							<button type="submit" class="btn btn-warning">수정</button>
-						        <button type="submit" class="btn btn-warning">삭제</button>
+						<c:if test="${sessionVO.userId == boardDetail.userId}">
+							<button type="button" class="btn lg green bbsUpdate">수정</button>
+						    <button type="button" class="btn lg red delBtn" data-command="bbsDelete">삭제</button>
 						</c:if>
 					</li>
-					
 					
 				</ul>
 			</div>
 			
 			<form class="form-horizontal" action="/BoardServlet" method="post" >
-				<input type="text" id="command" name="command" value="commentInsert" />
-				<input type="text" id="boardId" name="boardId" value="${boardDetail.id}" />
-				<input type="text" id="userId" name="userId" value="${sessionVO.userId}" />
+				<input type="hidden" id="command" name="command" value="commentInsert" />
+				<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
+				<input type="hidden" id="userId" name="userId" value="${sessionVO.userId}" />
 				
 				<div class="card-deck mb-3">
 					<div class="card md-4 shadow-sm">
@@ -68,37 +99,39 @@
 										</div>
 									</li>
 									<li class="col-md-1 float-r">
-								        <button type="button" class="commentSubmit" id="commentSubmit"  class="btn btn-warning" data-cmtdepth="0" data-cmtsort="1" >등록</button>
+								        <button type="button" class="commentSubmit btn lg green" id="commentSubmit"  class="btn btn-warning" data-cmtgroup="0" data-cmtdepth="0" data-cmtsort="1">등록</button>
 									</li>
 								</ul>
 							</form>
 						</div>
-						<div class="card-body ">
+								<style>
+									.commentArea dl { margin-bottom: 0px; }
+									.commentArea dt, .commentArea dd { display: inline-block; }
+									.commentArea dt { vertical-align: top; }
+									
+									.commentArea dd#addReCommentInput { display: block;  }
+									
+								</style>
+						<div class="commentArea card-body ">
 							<ul>
-								<li>
-									<dl class="dl-horizontal">
-										<dt>
-											aaa님
-											<span class="reComment" data-reDepth="1">댓글</span>									  		
-										</dt>
-										<dd>안녕하세요~</dd>
-
-									</dl>
-
-								</li>
-								<li>
-									<dl class="dl-horizontal">
-										<dt>
-											aaa2님
-											<span class="reComment" data-reDepth="1">댓글</span>
-										</dt>
-										<dd>안녕하세요~2</dd>
-										
-									</dl>
-								</li>
+								<c:forEach var="obj" items="${commentList}">
+									<li>
+										<dl class="dl-horizontal" style="padding-left: ${obj.depth}rem;">
+											<dt>
+												<c:if test="${obj.depth>0}">└</c:if>
+											</dt>
+											<dd>
+												${obj.userId} <span class="date">${obj.regdate}</span>
+												<span class="reComment btn sm black" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>	
+												<span class="delBtn btn sm red mgReset" data-cid="${obj.cId}" data-command="cmtDelete">삭제</span>
+												<p>${obj.contents}</p>  	
+											</dd>
+										</dl>
+									</li>
+								</c:forEach>
 							</ul>
-							
 						</div>
+						
 					</div>
 				</div>
 				
@@ -107,28 +140,29 @@
 				
 	</div>
 
+
 <script>
 	$(document).ready(function() {
 		// 원글->코멘트
 		$(document).on("click",".commentSubmit",function(e){
-			var result, comment;
+			var comment;
 			
-	    	var url 		= "/CommentServlet";
+	    	var url 			= "/CommentServlet";
 	    	var command 	= $("#command").val();
-	    	
-	    	var boardId 	= $("#boardId").val();
+	    	var boardId 		= $("#boardId").val();
 	    	var userId 		= $("#userId").val();
+	    	var cmtGroup 	= $(this).data("cmtgroup");
 	    	var cmtDepth 	= $(this).data("cmtdepth");
-	    	var cmtSort 	= $(this).data("cmtsort");
+	    	var cmtSort 		= $(this).data("cmtsort");
 
 
 	    	if(cmtDepth == 0){
 	    		comment = $("#comment").val();
 	    	}else{
-	    		comment = $("#reCommentInput").val();
+	    		comment = $("#reComment").val();
 	    	}
 	    	
-	    	var data = { command: command, boardId: boardId, userId: userId, comment: comment, cmtDepth: cmtDepth, cmtSort: cmtDepth };
+	    	var data = { command: command, boardId: boardId, userId: userId, comment: comment, cmtGroup: cmtGroup, cmtDepth: cmtDepth, cmtSort: cmtSort };
 
 	    	//console.log(data);
 	    	
@@ -141,22 +175,72 @@
 			reCommentClose();
 			
 			// 상위 dl 태그
+			var cmtGroup	= $(this).attr("data-cmtgroup");
 			var cmtDepth	= $(this).attr("data-cmtdepth");
 			var cmtSort		= $(this).attr("data-cmtsort");
 			var parent		= $(this).parents("dl");
-			
+			cmtDepth++;
 			//var findTag = parent.parents("ul").find("#addReCommentInput").text();
 			
 			var html  = "<dd id='addReCommentInput'>";
-				html += "	<input type='text' id='reCommentInput' name='reCommentInput' />";
-				html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-cmtdepth='"+cmtDepth+"' data-cmtsort='"+cmtSort+"'>등록</button>";
-				html += "	<button type='button' onClick='reCommentClose();'>닫기</button>";
-				html += "</dd>";
+				 html += "	<input type='text' id='reComment' name='reComment' />";
+			 	 html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-cmtgroup='"+cmtGroup+"' data-cmtdepth='"+ cmtDepth +"' data-cmtsort='"+ cmtSort +"'>등록</button>";
+				 html += "	<button type='button' onClick='reCommentClose();'>닫기</button>";
+				 html += "</dd>";
 
 			parent.append(html);
-
+		});
+		
+		//게시글 삭제
+		$(".delBtn").on("click",function(e){
+			var command = $(this).attr("data-command");
+			var url;
+	    	var boardId;
+	    	var userId;
+	    	
+			if(command == ""){
+				url = "/BoardServlet";
+		    	var boardId 	= $("#boardId").val();
+		    	var userId 		= $("#userId").val();	
+			}else if(command == ""){
+				var url 		= "/BoardServlet";
+		    	var boardId 	= $("#boardId").val();
+		    	var userId 		= $("#userId").val();
+				
+			}
+			
+			
+	    	
+			
 		});
 	});
+	
+	function BBSDel(){
+		var url 		= "/BoardServlet";
+    	var command 	= "bbsDelete";
+    	var boardId 	= $("#boardId").val();
+    	var userId 		= $("#userId").val();
+    	
+    	var data = { command: command, boardId: boardId, userId: userId };
+    	
+    	if(confirm("정말 삭제하시겠습니까?")){
+			callAjax(data, url);
+		}
+	}
+	
+	function cmtDel(){
+		var url 		= "/BoardServlet";
+    	var command 	= "cmtDelete";
+    	var boardId 	= $("#boardId").val();
+    	var userId 		= $("#userId").val();
+    	
+    	var data = { command: command, boardId: boardId, userId: userId };
+    	
+    	if(confirm("정말 삭제하시겠습니까?")){
+			callAjax(data, url);
+		}
+	
+	}
 	
 	function reCommentClose(){
 		$("#addReCommentInput").remove();
@@ -164,6 +248,8 @@
 
 	
     function callAjax(data, url){
+    	console.log(data, url);
+    	console.log(url);
     	$.ajax({
 			url:url,
 		    async:true,
@@ -175,13 +261,11 @@
 		    },
 		    success:function(resultData) {
 		    // 요청 완료 시
-			    console.log(resultData);
-		    	if(resultData.resultCode == "OK"){
-		    		alert("정상적으로 등록되었습니다.");
+		    	if(resultData.code == "OK"){
+		    		alert("성공.");
 		    	}else{
-		    		alert("등록실패 다시시도하세요.");		    		
+		    		alert("실패 다시시도하세요.");		    		
 		    	}
-		    	
 		    	location.reload();
 		    },
 		    error:function(request,status,error){

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import board.BoardVO;
+import board.CommentVO;
 import common.util.DBconn;
 
 // 게시판 쿼리
@@ -29,11 +30,10 @@ public class BoardDao {
 	}
 	
 	// 게시글 등록
-	public void insertBoard(BoardVO bvo){
+	public int insertBoard(BoardVO bvo){
+		int result = 0;
 		
 		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent, bRegDate) VALUES ( ?, ?, ?, now() );";
-		
-		System.out.println(sql);
 		
 		PreparedStatement pstmt = null;
 		try{	
@@ -43,7 +43,7 @@ public class BoardDao {
 			pstmt.setString(2, bvo.getTitle());
 			pstmt.setString(3, bvo.getContent());
 			
-			pstmt.executeUpdate();
+			result = pstmt.executeUpdate();
 			
 		}catch( SQLException e ) {
 			e.printStackTrace();
@@ -55,13 +55,45 @@ public class BoardDao {
 				e.printStackTrace();
 			}
 		}
+		
+		return result;
+	}
+	
+	// 방금 실행한 쿼리 행값 가져오기
+
+	public int resultRowCnt(){
+		
+		String sql="SELECT count(*) totalCnt FROM mvc_board;";
+		
+		int result = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try{
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+				result = rs.getInt("totalCnt");
+			}
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if( null != pstmt && !pstmt.isClosed() )
+					pstmt.close();
+				if( null != rs && !rs.isClosed() )
+					pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 	
 	// 게시글 전체 리스트
 	public List<BoardVO> selectBoard(){
-		String sql = "SELECT bId, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board ORDER BY  bRegdate DESC;";
-		
-		System.out.println(sql);
+		String sql = "SELECT SQL_CALC_FOUND_ROWS bId, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board ORDER BY  bRegdate DESC;";
 		
 		PreparedStatement pstmt = null;
 		//결과 탐색

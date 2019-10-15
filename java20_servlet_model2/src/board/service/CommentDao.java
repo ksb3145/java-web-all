@@ -29,26 +29,32 @@ public class CommentDao {
 	}
 	
 	//코멘트 등록
-	public void insertComment(CommentVO cvo){
+	public int insertComment(CommentVO cvo){
+		String sql = "INSERT INTO mvc_comment (bId, cmtGroup, sort, depth, contents, mUserId, regdate) VALUES (?, ?, ?, ?, ?, ?, now());";
 		
-		String sql = "INSERT INTO mvc_comment (cmtGroup, sort, depth, contents, mUserId, regdate) VALUES (?, ?, ?, ?, ?, now());";
-		
-		System.out.println(sql);
-		
+		int result = 0;
 		PreparedStatement pstmt = null;
+		
 		try{	
 			//sql 실행객체 생성
 			pstmt = conn.prepareStatement(sql);
 			
 			// ? 에 입력될 값 매핑
-			pstmt.setInt(1, cvo.getCmtGroup());
-			pstmt.setInt(2, cvo.getSort());
-			pstmt.setInt(3, cvo.getDepth());
-			pstmt.setString(4, cvo.getContents());
-			pstmt.setString(5, cvo.getUserId());
+			pstmt.setInt(1, cvo.getbId());
+			pstmt.setInt(2, cvo.getCmtGroup());
+			pstmt.setInt(3, cvo.getSort());
+			pstmt.setInt(4, cvo.getDepth());
+			pstmt.setString(5, cvo.getContents());
+			pstmt.setString(6, cvo.getUserId());
 			
 			pstmt.executeUpdate();
 			
+			ResultSet rs = pstmt.executeQuery("SELECT LAST_INSERT_ID()");
+			
+			if(rs.next()){
+				result = rs.getInt(1);
+			}
+
 		}catch( SQLException e ) {
 			e.printStackTrace();
 		}finally{
@@ -60,13 +66,46 @@ public class CommentDao {
 			}
 		}
 		
+		return result;
+	}
+	
+	// 코멘트 삭제
+	public int setCommentDel(int bId){
+		int result = 0;
+		
+		
+		return result;
+	}
+	
+	// 코멘트 그룹 업데이트
+	public int setGroupNOUpdate(int cId, int group){
+		int result = 0;
+		
+		String sql = "UPDATE mvc_comment SET cmtGroup = ? WHERE cId = ? ;";
+		PreparedStatement pstmt = null;
+		try{	
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, cId);
+			pstmt.setInt(2, group);
+			
+			result = pstmt.executeUpdate();
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if( pstmt != null && !pstmt.isClosed() )
+					pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 	
 	// 코멘트 리스트
-	public List<CommentVO> selectComment(){
-		String sql = "SELECT * FROM mvc_comment ORDER BY depth DESC, sort ASC, regdete DESC;";
-		
-		System.out.println(sql);
+	public List<CommentVO> selectComment(int bId){
+		String sql = "SELECT cId, bid, cmtGroup, sort, depth, contents, mUserId, regdate FROM mvc_comment WHERE delYN='N' AND bid = "+bId+" ORDER BY cmtGroup ASC, regdate ASC;";
 		
 		PreparedStatement pstmt = null;
 		//결과 탐색
@@ -79,8 +118,15 @@ public class CommentDao {
 			
 			while(rs.next()){
 				CommentVO cvo = new CommentVO();
-//					bvo.setId(rs.getInt("bId"));
-//					bvo.setTitle(rs.getString("bTitle"));
+				cvo.setcId(rs.getInt("cId"));
+				cvo.setbId(rs.getInt("bId"));
+				cvo.setCmtGroup(rs.getInt("cmtGroup"));
+				cvo.setSort(rs.getInt("sort"));
+				cvo.setDepth(rs.getInt("depth"));
+				cvo.setContents(rs.getString("contents"));
+				cvo.setUserId(rs.getString("mUserId"));
+				cvo.setRegdate(rs.getDate("regdate"));
+				
 				commentList.add(cvo);
 			}
 		}catch( SQLException e ) {

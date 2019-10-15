@@ -29,7 +29,7 @@
 			</div>
 			
 			
-			
+			<p>총: ${resultData.totalCnt} 건</p>
 			<table class="table table-bordered">
 				<tr>
 					<td>번호</td>
@@ -43,7 +43,7 @@
 				<c:forEach var="obj" items="${boardList}">
 					<tr>
 						<td>${obj.id}</td>
-						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}">${obj.title}</a></td>
+						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}&page=${resultData.page}">${obj.title}</a></td>
 						<td>${obj.userId}</td>
 						<td>${obj.regDate}</td>
 					</tr>
@@ -53,20 +53,17 @@
 			
 		</div>
 		
+		
+		
 		<div class="col-md-12">
 			<ul class="list-inline">
 				<li>
 					<nav aria-label="Page navigation example">
-						<ul class="pagination">
-							<li class="page-item"><a class="page-link" href="#">Prev</a></li>
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item"><a class="page-link" href="#">Next</a></li>
-						</ul>
+						${resultData.paging}
 					</nav>
 				</li>
 				<li class="float-r">
-					<a href="/BoardServlet?command=bbsWrite" class="btn btn-primary">글쓰기</a>
+					<a href="/BoardServlet?command=bbsWrite&page=${resultData.page}" class="btn btn-primary">글쓰기</a>
 				</li>
 			</ul>
 		</div>

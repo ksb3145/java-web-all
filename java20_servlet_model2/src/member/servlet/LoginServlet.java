@@ -69,7 +69,7 @@ public class LoginServlet extends HttpServlet {
 				MemberVO mvo = service.login(userId, userPw);
 				
 				if(null != mvo){
-					location = "/BoardServlet?command=bbsList";
+					location = "/BoardServlet?command=bbsList&page=1";
 					
 					req.setAttribute("code", "OK");
 					req.setAttribute("msg", "로그인 성공");

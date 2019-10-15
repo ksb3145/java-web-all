@@ -12,17 +12,21 @@ public class BoardService {
 	private MemberDao memberDao;
 	public BoardService(){
 		boardDao = BoardDao.getInstance();
+		memberDao = MemberDao.getInstance();
 	}
 	
-	public BoardVO setBBSInsert(BoardVO bvo){
+	public int setBBSInsert(BoardVO bvo){
 		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
-		
 		if (null != mvo){
-			boardDao.insertBoard(bvo);
-			return bvo;
+			return boardDao.insertBoard(bvo);
 		}else{
-			return null;
+			return 0;
 		}
+	}
+	
+	// 조회한 데이터 row count
+	public int resultRowCnt(){
+		return boardDao.resultRowCnt();
 	}
 	
 	// 게시판 리스트

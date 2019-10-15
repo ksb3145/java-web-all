@@ -1,6 +1,8 @@
 package board.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,12 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONObject;
+
 //import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.oreilly.servlet.MultipartRequest;
 
 import board.BoardVO;
 import board.service.BoardService;
+import board.service.CommentService;
 import member.vo.MemberVO;
 
 //@WebServlet("/BoardServlet")
@@ -53,18 +58,73 @@ public class BoardServlet extends HttpServlet {
     	
 		String location = "";
 		String command = req.getParameter("command");
+		String pno = req.getParameter("page");
+		int page = 1;
+		if(null != pno) page = Integer.parseInt(pno);
 		
-		System.out.println("command : "+command);
 		
 		if(command.equals("bbsList")){
-			System.out.println("게시판 리스트...");
+		/* S: 페이징 ____ 나중에 소스 분리하기 */
+			// 페이징 셋팅
+			String paging = "";
+			String url = "/BoardServlet?command=bbsList";
 			
-			location= "/WEB-INF/views/board/list.jsp";
+			int totalCnt = service.resultRowCnt();	// 총 게시물 수
+			int cntPage = 10;	// 페이지 수
+			int cntList = 10;	// 게시물 수
+			int totalPage = totalCnt / cntList;	// 총 페이지 수
+			int startPage = ((page - 1) / 10) * 10 + 1;	// 시작 페이지
+			int endPage = startPage + cntPage - 1;	// 마지막 페이지
 			
-			//System.out.println(service.getBoardList());
+			// 예외사항처리
+			if (totalCnt % cntList > 0) totalPage++; // 나머지가 있는 경우 "총 페이지 수"에 +1
+			if (totalPage < page) page = totalPage; // 현재 페이지가 총 페이지 수 보다 클 경우 총 페이지 번호로 치환
+			if (endPage > totalPage) endPage = totalPage; // 총 페이지가 마지막 페이지보다 클 경우 마지막 페이지로 치환
+			
+			// S: tag
+			paging += "<ul class='pagination'>";
+			if (startPage > 1){
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page=1'>처음</a></li>";
+			}
+			if (page > 1) {
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ (page-1) +"'>이전</a></li>";
+			}
+			
+			for (int i=startPage; i<=endPage; i++) {
+				paging += "<li class='page-item'>";
+				paging += "<a class='page-link' href='"+ url +"&page="+ i +"'>";
+				    if (i == page){
+				    	paging += "<b>"+ i +"</b>";
+				    }else{
+				    	paging += i;
+				    }
+			    paging += "</a>";
+			    paging += "</li>";
+			}
+
+			if (page < totalPage) {
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ (page+1) +"'>다음</a></li>";
+			}
+			if (endPage < totalPage) {
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ totalPage +"'>끝</a></li>";
+			}
+			paging += "</ul>";
+			// E: tag
+			
+		/* E: 페이징 */
+			
+			HashMap<Object, Object> resultData = new HashMap<Object, Object>();
+			resultData.put("totalCnt", totalCnt);
+			resultData.put("page", page);
+			resultData.put("paging", paging);
+			
+			
 			req.setAttribute("boardList", service.getBBSList());
 			req.setAttribute("code", "OK");
 			req.setAttribute("msg", "게시판 조회 성공");
+			req.setAttribute("resultData", resultData);
+			
+			location= "/WEB-INF/views/board/list.jsp";
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
@@ -89,18 +149,18 @@ public class BoardServlet extends HttpServlet {
 			bvo.setTitle(title);
 			bvo.setContent(content);
 			
-			BoardVO resultVO = service.setBBSInsert(bvo);
+			int result = service.setBBSInsert(bvo);
 			
-			if(null != resultVO){
+			if(result>0){
 				// 등록 성공
-				location = "/BoardServlet?command=bbsList";
+				location = "/BoardServlet?command=bbsList&page="+page;
 				
 				req.setAttribute("code", "OK");
 				req.setAttribute("msg", "등록 성공");	
 				
 			}else{
 				// 등록 실패
-				location = "/BoardServlet?command=bbsWrite";
+				location = "/BoardServlet?command=bbsWrite&page="+page;
 				
 				req.setAttribute("code", "Fail");
 				req.setAttribute("msg","등록 실패!");
@@ -112,6 +172,32 @@ public class BoardServlet extends HttpServlet {
 		}else if(command.equals("bbsUpdate")){
 			System.out.println("게시글 수정..");
 			
+		}else if(command.equals("bbsDelete")){
+			System.out.println("게시글 삭제..");
+			
+			String userId = req.getParameter("userId");
+			String title = req.getParameter("title");
+			String content = req.getParameter("content");
+			
+			BoardVO bvo = new BoardVO();
+			bvo.setUserId(userId);
+			bvo.setTitle(title);
+			bvo.setContent(content);
+			
+			//BoardVO resultVO = service.setBBSInsert(bvo);
+			
+			
+			// JSONObject는 HashMap을 상속
+			JSONObject json = new JSONObject(); 
+			json.put("code", "OK");
+		    
+		    // 헤더설정
+		    resp.setContentType("application/json");
+		    resp.setCharacterEncoding("UTF-8");
+		    
+		    PrintWriter out = resp.getWriter();
+		    out.print(json);
+			
 		}else if(command.equals("bbsView")){
 			System.out.println("게시판 상세보기..");
 			
@@ -120,8 +206,13 @@ public class BoardServlet extends HttpServlet {
 			String no = req.getParameter("no");
 			int boardId = Integer.parseInt(no);	// 게시판id
 			
+			
 			// 게시판 상세페이지 조회
 			req.setAttribute("boardDetail", service.getBBSView(boardId));
+			// 게시판 댓글
+			CommentService cmtService = new CommentService();
+			req.setAttribute("commentList", cmtService.getCommentList(boardId) );
+			req.setAttribute("page", page);
 			req.setAttribute("code", "OK");
 			req.setAttribute("msg", "게시판 조회 성공");
 			

@@ -71,7 +71,7 @@
 			<div class="col-md-12">
 				<ul class="list-inline">
 					<li>
-						<a href="/BoardServlet?command=bbsList" class="btn lg gray">목록</a>
+						<a href="/BoardServlet?command=bbsList&page=${page}" class="btn lg gray">목록</a>
 					</li>
 					<li class="float-r">
 						<c:if test="${sessionVO.userId == boardDetail.userId}">

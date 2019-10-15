@@ -69,17 +69,19 @@ public class BoardServlet extends HttpServlet {
 			String paging = "";
 			String url = "/BoardServlet?command=bbsList";
 			
-			int totalCnt = service.resultRowCnt();	// 총 게시물 수
+			int totalCnt = service.resultTotalCnt();	// 총 게시물 수
 			int cntPage = 10;	// 페이지 수
-			int cntList = 10;	// 게시물 수
-			int totalPage = totalCnt / cntList;	// 총 페이지 수
+			int limit = 5;	// 게시물 수
+			int offset = (page-1)*limit; //(페이지번호 - 1) * 로우 출력 사이즈
+			int totalPage = totalCnt / limit;	// 총 페이지 수
 			int startPage = ((page - 1) / 10) * 10 + 1;	// 시작 페이지
 			int endPage = startPage + cntPage - 1;	// 마지막 페이지
 			
 			// 예외사항처리
-			if (totalCnt % cntList > 0) totalPage++; // 나머지가 있는 경우 "총 페이지 수"에 +1
+			if (totalCnt % limit > 0) totalPage++; // 나머지가 있는 경우 "총 페이지 수"에 +1
 			if (totalPage < page) page = totalPage; // 현재 페이지가 총 페이지 수 보다 클 경우 총 페이지 번호로 치환
 			if (endPage > totalPage) endPage = totalPage; // 총 페이지가 마지막 페이지보다 클 경우 마지막 페이지로 치환
+			
 			
 			// S: tag
 			paging += "<ul class='pagination'>";
@@ -118,8 +120,12 @@ public class BoardServlet extends HttpServlet {
 			resultData.put("page", page);
 			resultData.put("paging", paging);
 			
+			HashMap<Object, Object> params = new HashMap<Object, Object>();
+			params.put("limit", limit);
+			params.put("offset", offset);
 			
-			req.setAttribute("boardList", service.getBBSList());
+			
+			req.setAttribute("boardList", service.getBBSList(params));
 			req.setAttribute("code", "OK");
 			req.setAttribute("msg", "게시판 조회 성공");
 			req.setAttribute("resultData", resultData);
@@ -199,13 +205,8 @@ public class BoardServlet extends HttpServlet {
 		    out.print(json);
 			
 		}else if(command.equals("bbsView")){
-			System.out.println("게시판 상세보기..");
-			
-			location= "/WEB-INF/views/board/view.jsp";
-			
 			String no = req.getParameter("no");
 			int boardId = Integer.parseInt(no);	// 게시판id
-			
 			
 			// 게시판 상세페이지 조회
 			req.setAttribute("boardDetail", service.getBBSView(boardId));
@@ -216,6 +217,7 @@ public class BoardServlet extends HttpServlet {
 			req.setAttribute("code", "OK");
 			req.setAttribute("msg", "게시판 조회 성공");
 			
+			location= "/WEB-INF/views/board/view.jsp";
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);

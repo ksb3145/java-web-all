@@ -3,13 +3,13 @@ package board;
 import java.util.Date;
 
 public class BoardVO {
-	
 	private int id;
 	private String userId;
 	private String title;
 	private String content;
 	private int hit;
 	private Date regDate;
+	
 	public int getId() {
 		return id;
 	}

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import board.BoardVO;
@@ -59,9 +60,8 @@ public class BoardDao {
 		return result;
 	}
 	
-	// 방금 실행한 쿼리 행값 가져오기
-
-	public int resultRowCnt(){
+	// 게시판 총 카운트
+	public int resultTotalCnt(){
 		
 		String sql="SELECT count(*) totalCnt FROM mvc_board;";
 		
@@ -92,8 +92,31 @@ public class BoardDao {
 	}
 	
 	// 게시글 전체 리스트
-	public List<BoardVO> selectBoard(){
-		String sql = "SELECT SQL_CALC_FOUND_ROWS bId, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board ORDER BY  bRegdate DESC;";
+	public List<BoardVO> selectBoard(HashMap<Object, Object> params){
+		
+		String sql;
+		
+		int rownum =0 , limit = 0;
+		String where = "";
+
+		if(params.get("offset") != "") rownum = (int)params.get("offset")+1;
+		if(params.get("limit") != "") limit = (int)params.get("limit");
+		
+		sql  = "SELECT B.* ";
+		sql += "FROM mvc_board B ";
+		sql += "WHERE (@rownum:="+rownum+")="+rownum+" AND "+(rownum-1)+"<bId ";
+		sql += where;
+		sql += "LIMIT "+limit;
+		
+		
+		System.out.println(sql);
+		
+//		SELECT
+//		@rownum:=@rownum+1 ROWNUM, b.*
+//		FROM mvc_board b
+//		WHERE (@rownum:=0)=0 AND 0< bId
+//		AND bTitle LIKE '%s%'
+//		LIMIT 5;
 		
 		PreparedStatement pstmt = null;
 		//결과 탐색
@@ -106,13 +129,14 @@ public class BoardDao {
 			
 			while(rs.next()){
 				BoardVO bvo = new BoardVO();
-
 				bvo.setId(rs.getInt("bId"));
 				bvo.setTitle(rs.getString("bTitle"));
 				bvo.setContent(rs.getString("bContent"));
 				bvo.setHit(rs.getInt("bHit"));
 				bvo.setRegDate(rs.getDate("bRegDate"));
 				bvo.setUserId(rs.getString("mUserId"));
+				
+				//System.out.println(bvo.toString());
 				
 				boardList.add(bvo);
 			}

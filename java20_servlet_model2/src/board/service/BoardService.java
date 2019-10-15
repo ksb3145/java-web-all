@@ -1,5 +1,6 @@
 package board.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import board.BoardVO;
@@ -25,13 +26,13 @@ public class BoardService {
 	}
 	
 	// 조회한 데이터 row count
-	public int resultRowCnt(){
-		return boardDao.resultRowCnt();
+	public int resultTotalCnt(){
+		return boardDao.resultTotalCnt();
 	}
 	
 	// 게시판 리스트
-	public List<BoardVO> getBBSList(){
-		return boardDao.selectBoard();	
+	public List<BoardVO> getBBSList(HashMap<Object, Object> params){
+		return boardDao.selectBoard(params);	
 	}
 	
 	// 게시판 상세페이지

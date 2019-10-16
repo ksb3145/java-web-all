@@ -47,7 +47,9 @@ public class LoginServlet extends HttpServlet {
 			
 			if(command.equals("home")){
 				
-				if(null == session.getAttribute("userId")){
+				SessionVO sVo = (SessionVO)session.getAttribute("sessionVO");
+				
+				if(null == sVo){
 					location= "/WEB-INF/views/member/login.jsp";
 				}else{
 					location= "/WEB-INF/views/member/home.jsp";

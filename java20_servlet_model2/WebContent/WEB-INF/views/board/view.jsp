@@ -100,7 +100,7 @@
 								    <button type="button" class="btn lg red delBtn" data-command="bbsDelete">삭제</button>
 								</c:if>
 								
-								<c:if test="${not empty sessionVO.userId}">
+								<c:if test="${sessionVO.userId ne boardDetail.userId}">
 									<button type="button" class="btn lg green" data-command="bbsDelete">답글</button>
 								</c:if>
 							</li>

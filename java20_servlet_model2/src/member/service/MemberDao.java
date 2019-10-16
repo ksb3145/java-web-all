@@ -16,23 +16,16 @@ public class MemberDao {
 		return instance;
 	}
 	
-	private Connection conn;
-	private MemberDao(){
-		try {
-			conn = DBconn.getConnection();
-		} catch ( ClassNotFoundException | SQLException e ) {
-			e.printStackTrace();
-		}
-	}
-	
 	// 회원등록
 	public void insertMember( MemberVO mvo ){
-		//쿼리문
+		PreparedStatement pstmt = null;
+		
 		String sql = "insert into mvc_member (mUserId, mUserPw, mUserName, mUserEmail) values (?,?,?,?);";
 		
-		PreparedStatement pstmt = null;
 		try{	
-			pstmt = conn.prepareStatement(sql);
+			
+			DBconn.dbConn = DBconn.getConnection();
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			
 			pstmt.setString(1, mvo.getUserId());
 			pstmt.setString(2, mvo.getUserPw());
@@ -41,13 +34,20 @@ public class MemberDao {
 			
 			pstmt.executeUpdate();
 			
-		}  catch ( SQLException e ) {
+		}catch ( SQLException e ) {
 			e.printStackTrace();
-		} finally {
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally {
 			try {
-				if( null != pstmt && !pstmt.isClosed() )
-					pstmt.close();
+				if( null != pstmt) pstmt.close();
 			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
@@ -55,14 +55,15 @@ public class MemberDao {
 	
 	// id 조회
 	public MemberVO selectOne( String id ){
-		String sql = "select mId, mUserId, mUserPw, mUserName, mUserEmail from mvc_member where mUserId = ?";
-		
-		PreparedStatement pstmt = null;
 		MemberVO mvo = null;
 		ResultSet rs = null;
+		PreparedStatement pstmt = null;
+		
+		String sql = "select mId, mUserId, mUserPw, mUserName, mUserEmail from mvc_member where mUserId = ?";
 		
 		try{
-			pstmt = conn.prepareStatement( sql );
+			DBconn.dbConn = DBconn.getConnection();
+			pstmt = DBconn.dbConn.prepareStatement( sql );
 			pstmt.setString( 1, id );
 			rs = pstmt.executeQuery();
 			
@@ -75,15 +76,26 @@ public class MemberDao {
 				mvo.setUserEmail( rs.getString("mUserEmail") );
 			}
 			
-		} catch ( SQLException e ) {
+		}catch ( SQLException e ) {
 			e.printStackTrace();
-		} finally {
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally {
 			try {
-				if( null != pstmt && !pstmt.isClosed() )
-					pstmt.close();
-				if( null != rs && !rs.isClosed() )
-					rs.close();
-			} catch ( SQLException e ){
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if( null != rs ) rs.close();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}

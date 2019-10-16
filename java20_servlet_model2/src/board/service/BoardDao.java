@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import board.BoardVO;
-import board.CommentVO;
 import common.util.DBconn;
 
 // 게시판 쿼리
@@ -21,25 +20,18 @@ public class BoardDao {
 		return instance;
 	}
 	
-	private Connection conn;
-	private BoardDao(){
-		try {
-			conn = DBconn.getConnection();
-		} catch ( ClassNotFoundException | SQLException e ) {
-			e.printStackTrace();
-		}
-	}
-	
 	// 게시글 등록
 	public int insertBoard(BoardVO bvo){
 		int result = 0;
+		PreparedStatement pstmt = null;
 		
 		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent) VALUES ( ?, ?, ?);";
 		
-		PreparedStatement pstmt = null;
-		try{	
-			pstmt = conn.prepareStatement(sql);
+		try{
 			
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			pstmt.setString(1, bvo.getUserId());
 			pstmt.setString(2, bvo.getTitle());
 			pstmt.setString(3, bvo.getContent());
@@ -48,29 +40,37 @@ public class BoardDao {
 			
 		}catch( SQLException e ) {
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}finally{
-			try {
-				if( null != pstmt && !pstmt.isClosed() )
-					pstmt.close();
-			} catch ( SQLException e ) {
+			
+			try{
+				if( null != pstmt) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try{
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		
 		return result;
 	}
 	
 	// 게시판 총 카운트
 	public int resultTotalCnt(){
-		
-		String sql="SELECT count(*) totalCnt FROM mvc_board;";
-		
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
+		String sql="SELECT count(*) totalCnt FROM mvc_board;";
+		
 		try{
-			pstmt = conn.prepareStatement(sql);
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
 			
 			if(rs.next()){
@@ -78,13 +78,25 @@ public class BoardDao {
 			}
 		}catch( SQLException e ) {
 			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}finally{
-			try {
-				if( null != pstmt && !pstmt.isClosed() )
-					pstmt.close();
-				if( null != rs && !rs.isClosed() )
-					rs.close();
-			} catch ( SQLException e ) {
+			
+			try{
+				if( null != pstmt ) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try{
+				if( null != rs ) rs.close();
+			}catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
+			try{
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
@@ -94,34 +106,37 @@ public class BoardDao {
 	// 게시글 전체 리스트
 	public List<BoardVO> selectBoard(HashMap<Object, Object> params){
 		
-		int offset=0;
-		String sql ="" , where = "";
-		
 		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		List<BoardVO> boardList = new ArrayList<BoardVO>();
+		ResultSet rs = null;
 		
-		int bNo = offset-1;
+		int offset=0;
 		int limit = (int)params.get("limit");
+		int bNo = offset-1;
 		
 		if(0>bNo) bNo = 0;
 		if(params.get("offset") != "") offset = (int)params.get("offset");
+		String sql = "" , where = "";
 		
 		sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
 		sql += " FROM mvc_board B";
 		sql += " WHERE (@rownum:="+offset+")="+offset;
-		sql += where;
+		sql +=  where;
 		sql += " ORDER BY bRegdate DESC";
 		sql += " LIMIT "+offset+","+limit;
 		
-		System.out.println("BoardDao list Sql ::: "+sql);
+		// System.out.println("BoardDao list Sql ::: "+sql);
 		
 		try{
-			pstmt = conn.prepareStatement(sql);
+			
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()){
 				BoardVO bvo = new BoardVO();
+				
 				bvo.setRownum(rs.getInt("ROWNUM"));
 				bvo.setId(rs.getInt("bId"));
 				bvo.setTitle(rs.getString("bTitle"));
@@ -130,33 +145,46 @@ public class BoardDao {
 				bvo.setRegDate(rs.getDate("bRegDate"));
 				bvo.setUserId(rs.getString("mUserId"));
 				
-				//System.out.println(bvo.toString());
-				
 				boardList.add(bvo);
 			}
 		}catch( SQLException e ) {
 			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}finally{
-			try {
-				if( null != pstmt && !pstmt.isClosed() )
-					pstmt.close();
-				if( null != rs && !rs.isClosed() )
-					rs.close();
-			} catch ( SQLException e ) {
+			
+			try{
+				if( null != pstmt ) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try{
+				if( null != rs ) rs.close();
+			}catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
+			try{
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		return boardList;
 	}
 	
+	// 게시글 수정
 	public int updateBoard(BoardVO bvo){
 		int result = 0;
 		
 		String sql = "UPDATE mvc_board SET bTitle = ?, bContent = ? WHERE bId = ? AND mUserId = ?";
-		System.out.println(sql);
+
 		PreparedStatement pstmt = null;
 		try{	
-			pstmt = conn.prepareStatement(sql);
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			pstmt.setString(1, bvo.getTitle());
 			pstmt.setString(2, bvo.getContent());
 			pstmt.setInt(3, bvo.getId());
@@ -166,11 +194,19 @@ public class BoardDao {
 			
 		}catch( SQLException e ) {
 			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}finally{
+			
 			try {
-				if( null != pstmt && !pstmt.isClosed() )
-					pstmt.close();
-			} catch ( SQLException e ) {
+				if( null != pstmt ) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
@@ -178,7 +214,7 @@ public class BoardDao {
 		return result;
 	}
 	
-	// 상세페이지
+	// 게시글 상세
 	public BoardVO selectView(int bId){
 	
 		String sql = "SELECT bId, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board WHERE bid=?;";
@@ -188,7 +224,9 @@ public class BoardDao {
 		ResultSet rs = null; //결과셋 참조변수들 준비
 		
 		try {
-			pstmt = conn.prepareStatement(sql);
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			pstmt.setInt(1, bId);
 			
 			rs = pstmt.executeQuery();
@@ -200,19 +238,31 @@ public class BoardDao {
 				bvo.setRegDate(rs.getDate("bRegDate"));
 				bvo.setId(rs.getInt("bId"));
 				bvo.setUserId(rs.getString("mUserId"));
-				
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		} finally{
-			try{
-	          if( null != pstmt && !pstmt.isClosed())
-	              pstmt.close();
-	          if( null != rs && !rs.isClosed())
-	              rs.close();
-			}catch(SQLException e){
-	          e.printStackTrace();
+			
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
 			}
+			
+			try {
+				if( null != rs ) rs.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
 		}
 		return bvo;
 	}

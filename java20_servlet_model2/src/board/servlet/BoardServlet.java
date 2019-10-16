@@ -2,30 +2,23 @@ package board.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 //import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.Session;
-
 import net.sf.json.JSONObject;
 
 //import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.oreilly.servlet.MultipartRequest;
-
 import board.BoardVO;
 import board.service.BoardService;
 import board.service.CommentService;
-import member.vo.MemberVO;
 
 //@WebServlet("/BoardServlet")
 public class BoardServlet extends HttpServlet {
@@ -55,37 +48,52 @@ public class BoardServlet extends HttpServlet {
 		req.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/html;charset-UTF-8");
 		
-    	// 멀티파트 요청시 null값 처리
-    	// 파일 업로드. 폼에서 가져온 인자값을 얻기 위해request 객체 전달, 업로드 경로, 파일 최대 크기, 한글처리, 파일 중복처리
-    	// MultipartRequest multi = new MultipartRequest(request, uploadPath, size, "euc-kr", new DefaultFileRenamePolicy());
-    	
 		String location = "";
 		String command = req.getParameter("command");
 		String pno = req.getParameter("page");
-		HttpSession session = req.getSession();
 		
 		int page = 1;
 		if(null != pno) page = Integer.parseInt(pno);
-		
-		
-		if(command.equals("bbsList")){
+
+		if(command.equals("bbsList")){	// 게시판 리스트
+			
+			
+			HashMap<Object, Object> resultData = new HashMap<Object, Object>();
+			HashMap<Object, Object> params = new HashMap<Object, Object>();
+			
 		/* S: 페이징 ____ 나중에 소스 분리하기 */
 			// 페이징 셋팅
 			String paging = "";
 			String url = "/BoardServlet?command=bbsList";
 			
-			int totalCnt = service.resultTotalCnt();	// 총 게시물 수
-			int cntPage = 10;	// 페이지 수
-			int limit = 10;	// 게시물 수
-			int offset = (page-1)*limit; //(페이지번호 - 1) * 로우 출력 사이즈
-			int totalPage = totalCnt / limit;	// 총 페이지 수
-			int startPage = ((page - 1) / 10) * 10 + 1;	// 시작 페이지
-			int endPage = startPage + cntPage - 1;	// 마지막 페이지
+			//검색
+			String searchType 	= (req.getParameter("searchType") == null) 	? "" : req.getParameter("searchType"); 	// 검색타입
+			String keyword 		= (req.getParameter("keyword") == null) 	? "" : req.getParameter("keyword"); 	// 검색어
+
+			if(searchType != ""){
+				resultData.put("searchType", searchType);
+				params.put("searchType",searchType);
+				location += "&searchType="+searchType;
+			}
+			if(keyword != ""){
+				resultData.put("keyword", keyword);
+				params.put("keyword",keyword);
+				location += "&keyword="+keyword;
+			}
+			
+			
+			int totalCnt = service.resultTotalCnt(params);	// 총 게시물 수
+			int cntPage = 10; 								// 페이지 수
+			int limit = 10;									// 게시물 수
+			int offset = (page-1)*limit; 					// (페이지번호 - 1) * 로우 출력 사이즈
+			int totalPage = totalCnt / limit;				// 총 페이지 수
+			int startPage = ((page - 1) / 10) * 10 + 1;		// 시작 페이지
+			int endPage = startPage + cntPage - 1;			// 마지막 페이지
 			
 			// 예외사항 처리
-			if (totalCnt % limit > 0) totalPage++; // 나머지가 있는 경우 "총 페이지 수"에 +1
-			if (totalPage < page) page = totalPage; // 현재 페이지가 총 페이지 수 보다 클 경우 총 페이지 번호로 치환
-			if (endPage > totalPage) endPage = totalPage; // 총 페이지가 마지막 페이지보다 클 경우 마지막 페이지로 치환
+			if (totalCnt % limit > 0) totalPage++; 			// 나머지가 있는 경우 "총 페이지 수"에 +1
+			if (totalPage < page) page = totalPage; 		// 현재 페이지가 총 페이지 수 보다 클 경우 총 페이지 번호로 치환
+			if (endPage > totalPage) endPage = totalPage; 	// 총 페이지가 마지막 페이지보다 클 경우 마지막 페이지로 치환
 			
 			// S: tag
 			paging += "<ul class='pagination'>";
@@ -118,17 +126,14 @@ public class BoardServlet extends HttpServlet {
 			// E: tag
 		/* E: 페이징 */
 			
-			HashMap<Object, Object> resultData = new HashMap<Object, Object>();
+			
 			resultData.put("totalCnt", totalCnt);
 			resultData.put("page", page);
 			resultData.put("paging", paging);
 			
-			
-			HashMap<Object, Object> params = new HashMap<Object, Object>();
 			params.put("page", page);
 			params.put("limit", limit);
 			params.put("offset", offset);
-			
 			
 			req.setAttribute("boardList", service.getBBSList(params));
 			req.setAttribute("code", "OK");
@@ -140,14 +145,12 @@ public class BoardServlet extends HttpServlet {
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			
-		}else if(command.equals("bbsWriteView")){
-			System.out.println("게시글 등록 화면..");
+			
+		}else if(command.equals("bbsWriteView")){	// 게시글 입력화면
+			
 			
 			String no = (req.getParameter("boardId") == null) ? "" : req.getParameter("boardId");
 			String userId = (req.getParameter("userId") == null) ? "" : req.getParameter("userId");
-			
-//			String sessionId = (String) session.getAttribute("userId");
-//			System.out.println("sessionId::::::::::::::"+sessionId+", userId:::::::::::::::::::"+userId);
 			
 			if( no != "" && userId != ""){
 				int boardId = Integer.parseInt(no);	// 게시판id
@@ -163,8 +166,9 @@ public class BoardServlet extends HttpServlet {
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			
-		}else if(command.equals("bbsInsert")){
-			System.out.println("게시글 등록..");
+			
+		}else if(command.equals("bbsInsert")){	// 게시글 등록
+			
 			
 			String userId = req.getParameter("userId");
 			String title = req.getParameter("title");
@@ -192,8 +196,10 @@ public class BoardServlet extends HttpServlet {
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
-		}else if(command.equals("bbsUpdate")){
-			System.out.println("게시글 수정..");
+			
+			
+		}else if(command.equals("bbsUpdate")){	//게시글 수정
+			
 			
 			String no = req.getParameter("boardId");
 			String userId = req.getParameter("userId");
@@ -220,15 +226,16 @@ public class BoardServlet extends HttpServlet {
 			}
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
-		}else if(command.equals("bbsDelete")){
-			System.out.println("게시글 삭제..");
+			
+			
+		}else if(command.equals("bbsDelete")){	// 게시글 삭제
+			
 			
 			String boardId = req.getParameter("boardId");
 			String userId = req.getParameter("userId");
 			
 			BoardVO bvo = new BoardVO();
 			bvo.setUserId(userId);
-			
 			
 			// JSONObject는 HashMap을 상속
 			JSONObject json = new JSONObject(); 
@@ -241,7 +248,10 @@ public class BoardServlet extends HttpServlet {
 		    PrintWriter out = resp.getWriter();
 		    out.print(json);
 			
+		    
 		}else if(command.equals("bbsView")){
+			
+			
 			String no = req.getParameter("no");
 			int boardId = Integer.parseInt(no);
 			

@@ -60,12 +60,22 @@ public class BoardDao {
 	}
 	
 	// 게시판 총 카운트
-	public int resultTotalCnt(){
+	public int resultTotalCnt(HashMap<Object, Object> params){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql="SELECT count(*) totalCnt FROM mvc_board;";
+		String where = "";
+		String searchType 	= (params.get("searchType") == null) 	? "" : (String) params.get("searchType"); 	// 검색타입
+		String keyword		= (params.get("keyword") == null) 		? "" : (String) params.get("keyword"); 		// 검색어
+		
+		if(searchType != "" && keyword != "") where += " WHERE "+searchType+" LIKE '"+keyword+"%'";
+		
+		
+		String sql="SELECT count(*) totalCnt FROM mvc_board "+ where;
+		System.out.println(sql);
+		//검색
+
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();
@@ -110,13 +120,18 @@ public class BoardDao {
 		List<BoardVO> boardList = new ArrayList<BoardVO>();
 		ResultSet rs = null;
 		
+		String sql = "" , where = "";
 		int offset=0;
 		int limit = (int)params.get("limit");
 		int bNo = offset-1;
 		
 		if(0>bNo) bNo = 0;
 		if(params.get("offset") != "") offset = (int)params.get("offset");
-		String sql = "" , where = "";
+		//검색
+		String searchType 	= (params.get("searchType") == null) 	? "" : (String) params.get("searchType"); 	// 검색타입
+		String keyword		= (params.get("keyword") == null) 		? "" : (String) params.get("keyword"); 		// 검색어
+		
+		if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '"+keyword+"%'";
 		
 		sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
 		sql += " FROM mvc_board B";
@@ -125,7 +140,7 @@ public class BoardDao {
 		sql += " ORDER BY bRegdate DESC";
 		sql += " LIMIT "+offset+","+limit;
 		
-		// System.out.println("BoardDao list Sql ::: "+sql);
+		System.out.println("BoardDao list Sql ::: "+sql);
 		
 		try{
 			

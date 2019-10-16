@@ -1,10 +1,7 @@
 package board.service;
 
 import java.util.List;
-
-import board.BoardVO;
 import board.CommentVO;
-import member.service.MemberDao;
 
 public class CommentService {
 	
@@ -18,6 +15,11 @@ public class CommentService {
 		return commentDao.insertComment(cvo);
 	}
 	
+	// **memo 아직.. 수정중,, 소스에 적용안함**
+	// 코멘트 그불 순서 업뎃 (sort) 
+	public int setCommentSortUp(CommentVO cvo){
+		return commentDao.setCommentSortUp(cvo);
+	}
 	// 코멘트 그룹(부모글 key) 업뎃
 	public int setGroupNOUpdate(int cId, int group){
 		return commentDao.setGroupNOUpdate(cId, group);

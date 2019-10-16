@@ -3,17 +3,13 @@ package board.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import board.BoardVO;
 import board.CommentVO;
 import board.service.CommentService;
-import member.vo.MemberVO;
 import net.sf.json.JSONObject;
 
 public class CommentServlet extends HttpServlet {
@@ -50,15 +46,17 @@ public class CommentServlet extends HttpServlet {
 			
 			String resultCode 	= "OK"; // 결과코드
 			String boardId		= req.getParameter("boardId");	// 게시글
-			String userId		= req.getParameter("userId");		// 댓글 작성자
+			String userId		= req.getParameter("userId");	// 댓글 작성자
 			String comment		= req.getParameter("comment");	// 댓글 내용
 			String cmtGroup		= req.getParameter("cmtGroup");	// 댓글 그룹
+			String cmtPid		= req.getParameter("pid");		// 부모 댓글 키값
 			String cmtDepth		= req.getParameter("cmtDepth");	// 댓글 깊이
 			String cmtSort		= req.getParameter("cmtSort");	// 댓글 순서
 			
 			// 캐스팅..
 			int bId				= Integer.parseInt(boardId);
 			int group			= Integer.parseInt(cmtGroup);
+			int pId				= Integer.parseInt(cmtPid);
 			int depth			= Integer.parseInt(cmtDepth);
 			int sort 			= Integer.parseInt(cmtSort);
 			
@@ -66,11 +64,15 @@ public class CommentServlet extends HttpServlet {
 			CommentVO cvo = new CommentVO();
 			cvo.setbId(bId);
 			cvo.setUserId(userId);
+			cvo.setpId(pId);
 			cvo.setContents(comment);
 			cvo.setDepth(depth);
 			cvo.setSort(sort);
 			
-			if(group>0) cvo.setCmtGroup(group);		// 원글(댓글)이 아니면(=대댓글) 부모의 group값
+			if(group>0) {
+				cvo.setCmtGroup(group);		// 원글(댓글)이 아니면(=대댓글) 부모의 group값
+			}
+			
 			int cId = service.setCommentInsert(cvo);	// 원글이면 insert 후 last_insert_ID 값
 			
 			if(cId == 0){

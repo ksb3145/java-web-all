@@ -3,12 +3,12 @@ package member.vo;
 import java.util.Date;
 
 public class MemberVO {
-	private int id;
-	private String userId;
-	private String userPw;
-	private String userName;
-	private String userEmail;
-	private Date regDate;
+	private int id;				// key
+	private String userId;		// 아이디
+	private String userPw;		// 비번
+	private String userName;	// 이름
+	private String userEmail;	// 메일
+	private Date regDate;		// 가입일
 	
 	public int getId() {
 		return id;

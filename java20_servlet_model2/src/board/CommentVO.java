@@ -7,7 +7,8 @@ public class CommentVO {
 	public int cId;			// 댓글 키값
 	public int bId;			// 게시글 키
 	public int cmtGroup; 	// 댓글 그룹
-	public int sort;			// 댓글 순서
+	public int pId;			// 부모 댓글의 key (cid)
+	public int sort;		// 댓글 순서
 	public int depth;		// 댓글 깊이 (댓글, 댓글의 댓글 ..)
 	public String contents; // 댓글 내용
 	public String userId; 	// 댓글 작성자
@@ -31,6 +32,12 @@ public class CommentVO {
 	public void setCmtGroup(int cmtGroup) {
 		this.cmtGroup = cmtGroup;
 	}
+	public int getpId() {
+		return pId;
+	}
+	public void setpId(int pId) {
+		this.pId = pId;
+	}
 	public int getSort() {
 		return sort;
 	}
@@ -43,7 +50,6 @@ public class CommentVO {
 	public void setDepth(int depth) {
 		this.depth = depth;
 	}
-	
 	public String getContents() {
 		return contents;
 	}
@@ -64,7 +70,7 @@ public class CommentVO {
 	}
 	@Override
 	public String toString() {
-		return "CommentVO [cId=" + cId + ", bId=" + bId + ", cmtGroup="
+		return "CommentVO [cId=" + cId + ", bId=" + bId + ", pId=" + pId + ", cmtGroup="
 				+ cmtGroup + ", sort=" + sort + ", depth=" + depth
 				+ ", contents=" + contents + ", userId=" + userId
 				+ ", regdate=" + regdate + "]";

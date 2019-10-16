@@ -83,7 +83,7 @@
 							<form name="bFrm" action="/BoardServlet?command=bbsWriteView" method="post" >
 						</c:when>
 						<c:otherwise>
-						<!-- 답글 주소고고! -->
+							<!-- 답글 주소고고! -->
 							<form name="bFrm" action="/BoardServlet?command=bbsReplyView" method="post" >
 						</c:otherwise>
 					</c:choose>
@@ -146,7 +146,7 @@
 												<c:if test="${sessionVO.userId == obj.userId}">	
 												<span class="delBtn btn sm red" data-cid="${obj.cId}" data-command="cmtDelete">삭제</span>
 												</c:if>
-												<span class="reComment btn sm black mgReset" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>
+												<span class="reComment btn sm black mgReset" data-cid="${obj.cId}" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>
 												<p>${obj.contents}</p>  	
 											</dd>
 										</dl>
@@ -169,7 +169,7 @@
 	$(document).ready(function() {
 		// 원글->코멘트
 		$(document).on("click",".commentSubmit",function(e){
-			var comment;
+			var comment, pid;
 			
 	    	var url 		= "/CommentServlet";
 	    	var command 	= $("#command").val();
@@ -178,18 +178,21 @@
 	    	var cmtGroup 	= $(this).data("cmtgroup");
 	    	var cmtDepth 	= $(this).data("cmtdepth");
 	    	var cmtSort 	= $(this).data("cmtsort");
+	    	
 
 
 	    	if(cmtDepth == 0){
+	    		pid 	= 0;
 	    		comment = $("#comment").val();
 	    	}else{
+	    		pid 	= $(this).data("cid");
 	    		comment = $("#reComment").val();
 	    	}
 	    	
-	    	var data = { command: command, boardId: boardId, userId: userId, comment: comment, cmtGroup: cmtGroup, cmtDepth: cmtDepth, cmtSort: cmtSort };
+	    	var data = { pid: pid, command: command, boardId: boardId, userId: userId, comment: comment, cmtGroup: cmtGroup, cmtDepth: cmtDepth, cmtSort: cmtSort };
 
-	    	//console.log(data);
-	    	
+	    	console.log(data);
+	    
 			callAjax(data, url);
 
 		});
@@ -199,6 +202,7 @@
 			reCommentClose();
 			
 			// 상위 dl 태그
+			var cid			= $(this).attr("data-cid");
 			var cmtGroup	= $(this).attr("data-cmtgroup");
 			var cmtDepth	= $(this).attr("data-cmtdepth");
 			var cmtSort		= $(this).attr("data-cmtsort");
@@ -208,7 +212,7 @@
 			
 			var html  = "<dd id='addReCommentInput'>";
 				 html += "	<input type='text' id='reComment' name='reComment' />";
-			 	 html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-cmtgroup='"+cmtGroup+"' data-cmtdepth='"+ cmtDepth +"' data-cmtsort='"+ cmtSort +"'>등록</button>";
+			 	 html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-cid='"+cid+"' data-cmtgroup='"+cmtGroup+"' data-cmtdepth='"+ cmtDepth +"' data-cmtsort='"+ cmtSort +"'>등록</button>";
 				 html += "	<button type='button' onClick='reCommentClose();'>닫기</button>";
 				 html += "</dd>";
 

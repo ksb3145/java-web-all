@@ -7,20 +7,23 @@
 			<div class="card-deck mb-3 text-center">
 				<div class="card md-4 shadow-sm">
 					<div class="card-body ">
-						<form>
+						<form name="sFrm" action="/BoardServlet" method="get">
+						<input type="text" id="command" name="command" value="bbsList" />
+						
 						<ul class="list-inline">
 							<li class="col-md-2">
-								<select class="form-control">
+								<select id="searchType" name="searchType" class="form-control">
 									<option value="">::선택하세요::</option>
-									<option value="">제목</option>
-									<option value="">아이디</option>
+									<option <c:if test="${resultData.type eq 'bTitle'}"> selected</c:if> value="bTitle">제목</option>
+									<option <c:if test="${resultData.type eq 'mUserId'}"> selected </c:if> value="mUserId">아이디</option>
+									<option <c:if test="${resultData.type eq 'bContent'}"> selected </c:if> value="bContent">본문</option>
 								</select>
 							</li>
 							<li class="col-md-6">
-								<input class="form-control"  type="text" name="keyword" id="keyword" placeholder="검색어를 입력하세요." />
+								<input class="form-control"  type="text" name="keyword" id="keyword" value="${resultData.keyword}" placeholder="검색어를 입력하세요." />
 							</li>
 							<li class="col-md-1 vertical-top">
-								<a class="form-control">확인</a>
+								<button type="submit" >검색</button>
 							</li>
 						</ul>
 						</form>

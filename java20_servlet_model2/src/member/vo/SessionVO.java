@@ -1,9 +1,9 @@
 package member.vo;
 
 public class SessionVO {
-	private String userId;
-	private String userName;
-	private String userEmail;
+	private String userId;		// 로그인) 아이디
+	private String userName;	// 로그인) 이름
+	private String userEmail;	// 로그인) 이메일
 	
 	public String getUserId() {
 		return userId;

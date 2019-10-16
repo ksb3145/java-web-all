@@ -3,13 +3,13 @@ package board;
 import java.util.Date;
 
 public class BoardVO {
-	private int rownum;
-	private int id;
-	private String userId;
-	private String title;
-	private String content;
-	private int hit;
-	private Date regDate;
+	private int rownum;		// 게시글 번호
+	private int id;			// 게시글 key
+	private String userId;	// 작성자id
+	private String title;	// 제목
+	private String content;	// 내용
+	private int hit;		// 조회수
+	private Date regDate;	// 작성일
 	
 	public int getRownum() {
 		return rownum;

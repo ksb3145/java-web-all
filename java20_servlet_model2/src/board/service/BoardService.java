@@ -37,8 +37,8 @@ public class BoardService {
 	}
 	
 	// 조회한 데이터 row count
-	public int resultTotalCnt(){
-		return boardDao.resultTotalCnt();
+	public int resultTotalCnt(HashMap<Object, Object> params){
+		return boardDao.resultTotalCnt(params);
 	}
 	
 	// 게시판 리스트

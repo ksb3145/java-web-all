@@ -34,55 +34,83 @@
 	
 	.commentArea span.date { font-size: 11px; color: gray; padding-left: 5px; }
 	.commentArea p { margin-bottom: 5px; }
+	
+	.commentArea dl { margin-bottom: 0px; }
+	.commentArea dt, .commentArea dd { display: inline-block; }
+	.commentArea dt { vertical-align: top; }
+
+	.commentArea dd#addReCommentInput { display: block;  }
+				
 </style>
 	
 	<div class="row">
 	
 		<div class="col-md-12">
 			<h4>상세보기</h4>
-			<table class="table table-bordered">
-				<colgroup>
-					<col width="10%" />
-					<col width="" />
-					<col width="10%" />
-					<col width="15%" />
-					<col width="10%" />
-					<col width="15%" />
-				</colgroup>
-				<tbody>
-					<tr>
-						<th>제목</th>
-						<td colspan="5">${boardDetail.title}</td>
-					</tr>
-					<tr>
-						<th>작성자</th>
-						<td>${boardDetail.userId}</td>
-						<th>작성일</th>
-						<td>${boardDetail.regDate}</td>
-						<th>첨부파일</th>
-						<td> - </td>
-					</tr>
-					<tr>
-						<td colspan="6">${boardDetail.content}</td>
-					</tr>
-				</tbody>
-			</table>
+			<!-- s: 게시판 form -->
 			
-			<div class="col-md-12">
-				<ul class="list-inline">
-					<li>
-						<a href="/BoardServlet?command=bbsList&page=${page}" class="btn lg gray">목록</a>
-					</li>
-					<li class="float-r">
-						<c:if test="${sessionVO.userId == boardDetail.userId}">
-							<button type="button" class="btn lg green bbsUpdate">수정</button>
-						    <button type="button" class="btn lg red delBtn" data-command="bbsDelete">삭제</button>
-						</c:if>
-					</li>
-					
-				</ul>
-			</div>
+				<table class="table table-bordered">
+					<colgroup>
+						<col width="10%" />
+						<col width="" />
+						<col width="10%" />
+						<col width="15%" />
+						<col width="10%" />
+						<col width="15%" />
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>제목</th>
+							<td colspan="5">${boardDetail.title}</td>
+						</tr>
+						<tr>
+							<th>작성자</th>
+							<td>${boardDetail.userId}</td>
+							<th>작성일</th>
+							<td>${boardDetail.regDate}</td>
+							<th>첨부파일</th>
+							<td> - </td>
+						</tr>
+						<tr>
+							<td colspan="6">${boardDetail.content}</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<div class="col-md-12">
+					<c:choose>
+						<c:when test="${sessionVO.userId eq boardDetail.userId}" >
+							<form name="bFrm" action="/BoardServlet?command=bbsWriteView" method="post" >
+						</c:when>
+						<c:otherwise>
+						<!-- 답글 주소고고! -->
+							<form name="bFrm" action="/BoardServlet?command=bbsReplyView" method="post" >
+						</c:otherwise>
+					</c:choose>
+						<input type="hidden" name="page" value="${page}" />
+						<ul class="list-inline">
+							<li>
+								<a href="/BoardServlet?command=bbsList&page=${page}" class="btn lg gray">목록</a>
+							</li>
+							<li class="float-r">
+								<c:if test="${sessionVO.userId eq boardDetail.userId}">
+									<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
+									<input type=hidden id="userId" name="userId" value="${sessionVO.userId}" />
+									<button type="submit" class="btn lg green">수정</button>
+								    <button type="button" class="btn lg red delBtn" data-command="bbsDelete">삭제</button>
+								</c:if>
+								
+								<c:if test="${not empty sessionVO.userId}">
+									<button type="button" class="btn lg green" data-command="bbsDelete">답글</button>
+								</c:if>
+							</li>
+						</ul>
+					</form>
+				</div>
+			<!-- e: 게시판 form -->
 			
+			
+			<!-- s: 댓글 form -->
 			<form class="form-horizontal" action="/BoardServlet" method="post" >
 				<input type="hidden" id="command" name="command" value="commentInsert" />
 				<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
@@ -104,14 +132,7 @@
 								</ul>
 							</form>
 						</div>
-								<style>
-									.commentArea dl { margin-bottom: 0px; }
-									.commentArea dt, .commentArea dd { display: inline-block; }
-									.commentArea dt { vertical-align: top; }
-									
-									.commentArea dd#addReCommentInput { display: block;  }
-									
-								</style>
+								
 						<div class="commentArea card-body ">
 							<ul>
 								<c:forEach var="obj" items="${commentList}">
@@ -138,6 +159,7 @@
 				</div>
 				
 			</form>
+			<!-- e: 댓글 form -->
 		</div>
 				
 	</div>

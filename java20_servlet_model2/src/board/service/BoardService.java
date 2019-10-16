@@ -16,10 +16,21 @@ public class BoardService {
 		memberDao = MemberDao.getInstance();
 	}
 	
+	// 게시글 등록
 	public int setBBSInsert(BoardVO bvo){
 		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
 		if (null != mvo){
 			return boardDao.insertBoard(bvo);
+		}else{
+			return 0;
+		}
+	}
+	
+	// 게시글 수정
+	public int setBBSUpdate(BoardVO bvo){
+		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
+		if (null != mvo){
+			return boardDao.updateBoard(bvo);
 		}else{
 			return 0;
 		}

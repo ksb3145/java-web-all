@@ -50,7 +50,7 @@ public class BoardDao {
 			e.printStackTrace();
 		}finally{
 			try {
-				if( pstmt != null && !pstmt.isClosed() )
+				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
@@ -83,7 +83,7 @@ public class BoardDao {
 				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 				if( null != rs && !rs.isClosed() )
-					pstmt.close();
+					rs.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
 			}
@@ -94,38 +94,27 @@ public class BoardDao {
 	// 게시글 전체 리스트
 	public List<BoardVO> selectBoard(HashMap<Object, Object> params){
 		
-		String sql;
-		
-		int rownum =0 , limit = 0;
-		String where = "";
-
-		if(params.get("offset") != "") rownum = (int)params.get("offset");
-		if(params.get("limit") != "") limit = (int)params.get("limit")*(int)params.get("page");
-		
-		int bNo = rownum-1;
-		if(0>bNo) bNo = 0;
-		
-		sql  = "SELECT B.* ";
-		sql += "FROM mvc_board B ";
-		sql += "WHERE (@rownum:="+rownum+")="+rownum+" AND "+ bNo +"<bId ";
-		sql += where;
-		sql += "ORDER BY bRegdate DESC ";
-		sql += "LIMIT "+limit;
-		
-		
-		System.out.println(sql);
-		
-//		SELECT
-//		@rownum:=@rownum+1 ROWNUM, b.*
-//		FROM mvc_board b
-//		WHERE (@rownum:=0)=0 AND 0< bId
-//		AND bTitle LIKE '%s%'
-//		LIMIT 5;
+		int offset=0;
+		String sql ="" , where = "";
 		
 		PreparedStatement pstmt = null;
-		//결과 탐색
 		ResultSet rs = null;
 		List<BoardVO> boardList = new ArrayList<BoardVO>();
+		
+		int bNo = offset-1;
+		int limit = (int)params.get("limit");
+		
+		if(0>bNo) bNo = 0;
+		if(params.get("offset") != "") offset = (int)params.get("offset");
+		
+		sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
+		sql += " FROM mvc_board B";
+		sql += " WHERE (@rownum:="+offset+")="+offset;
+		sql += where;
+		sql += " ORDER BY bRegdate DESC";
+		sql += " LIMIT "+offset+","+limit;
+		
+		System.out.println("BoardDao list Sql ::: "+sql);
 		
 		try{
 			pstmt = conn.prepareStatement(sql);
@@ -133,6 +122,7 @@ public class BoardDao {
 			
 			while(rs.next()){
 				BoardVO bvo = new BoardVO();
+				bvo.setRownum(rs.getInt("ROWNUM"));
 				bvo.setId(rs.getInt("bId"));
 				bvo.setTitle(rs.getString("bTitle"));
 				bvo.setContent(rs.getString("bContent"));
@@ -151,12 +141,41 @@ public class BoardDao {
 				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 				if( null != rs && !rs.isClosed() )
-					pstmt.close();
+					rs.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
 			}
 		}
 		return boardList;
+	}
+	
+	public int updateBoard(BoardVO bvo){
+		int result = 0;
+		
+		String sql = "UPDATE mvc_board SET bTitle = ?, bContent = ? WHERE bId = ? AND mUserId = ?";
+		System.out.println(sql);
+		PreparedStatement pstmt = null;
+		try{	
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, bvo.getTitle());
+			pstmt.setString(2, bvo.getContent());
+			pstmt.setInt(3, bvo.getId());
+			pstmt.setString(4, bvo.getUserId());
+			
+			result = pstmt.executeUpdate();
+			
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if( null != pstmt && !pstmt.isClosed() )
+					pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 	
 	// 상세페이지
@@ -187,10 +206,10 @@ public class BoardDao {
 			e.printStackTrace();
 		} finally{
 			try{
-	          if( pstmt != null && !pstmt.isClosed())
+	          if( null != pstmt && !pstmt.isClosed())
 	              pstmt.close();
-	          if( rs != null && !rs.isClosed())
-	              pstmt.close();
+	          if( null != rs && !rs.isClosed())
+	              rs.close();
 			}catch(SQLException e){
 	          e.printStackTrace();
 			}

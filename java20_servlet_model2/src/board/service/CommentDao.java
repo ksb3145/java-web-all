@@ -59,7 +59,7 @@ public class CommentDao {
 			e.printStackTrace();
 		}finally{
 			try {
-				if( pstmt != null && !pstmt.isClosed() )
+				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
@@ -93,7 +93,7 @@ public class CommentDao {
 			e.printStackTrace();
 		}finally{
 			try {
-				if( pstmt != null && !pstmt.isClosed() )
+				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
@@ -136,7 +136,7 @@ public class CommentDao {
 				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 				if( null != rs && !rs.isClosed() )
-					pstmt.close();
+					rs.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
 			}

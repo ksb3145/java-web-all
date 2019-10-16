@@ -38,11 +38,9 @@
 					<td>작성일</td>
 				</tr>
 				
-				
-				
 				<c:forEach var="obj" items="${boardList}">
 					<tr>
-						<td>${obj.id}</td>
+						<td>${obj.rownum}</td>
 						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}&page=${resultData.page}">${obj.title}</a></td>
 						<td>${obj.userId}</td>
 						<td>${obj.regDate}</td>
@@ -50,10 +48,7 @@
 				</c:forEach>
 				
 			</table>
-			
 		</div>
-		
-		
 		
 		<div class="col-md-12">
 			<ul class="list-inline">
@@ -63,7 +58,7 @@
 					</nav>
 				</li>
 				<li class="float-r">
-					<a href="/BoardServlet?command=bbsWrite&page=${resultData.page}" class="btn btn-primary">글쓰기</a>
+					<a href="/BoardServlet?command=bbsWriteView&page=${resultData.page}" class="btn btn-primary">글쓰기</a>
 				</li>
 			</ul>
 		</div>

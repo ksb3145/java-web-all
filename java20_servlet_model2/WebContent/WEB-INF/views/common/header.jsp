@@ -13,7 +13,7 @@
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 
-<title>상단</title>
+<title>게시판</title>
 </head>
 <body>
 <div class="container">
@@ -27,7 +27,7 @@
 					<c:choose>
 						<c:when test="${sessionVO.userId ne null}">
 							<li class="text-center"><a href="/BoardServlet?command=bbsList">게시판</a></li>
-							<li class="text-center float-r"><small><a href="#">로그아웃</a></small></li>
+							<li class="text-center float-r"><small><a href="/loginServlet?command=logout">로그아웃</a></small></li>
 							<li class="text-center float-r"><small><c:out value="${sessionVO.userId}" /> 님</small></li>
 						</c:when>
 						<c:otherwise>

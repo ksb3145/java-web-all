@@ -45,7 +45,7 @@ public class MemberDao {
 			e.printStackTrace();
 		} finally {
 			try {
-				if( pstmt != null && !pstmt.isClosed() )
+				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
 			} catch ( SQLException e ) {
 				e.printStackTrace();
@@ -79,12 +79,10 @@ public class MemberDao {
 			e.printStackTrace();
 		} finally {
 			try {
-				
-				if( pstmt != null && !pstmt.isClosed() )
+				if( null != pstmt && !pstmt.isClosed() )
 					pstmt.close();
-				if( rs != null && !rs.isClosed() )
-					pstmt.close();
-				
+				if( null != rs && !rs.isClosed() )
+					rs.close();
 			} catch ( SQLException e ){
 				e.printStackTrace();
 			}

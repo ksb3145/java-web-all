@@ -3,6 +3,7 @@ package board;
 import java.util.Date;
 
 public class BoardVO {
+	private int rownum;
 	private int id;
 	private String userId;
 	private String title;
@@ -10,6 +11,12 @@ public class BoardVO {
 	private int hit;
 	private Date regDate;
 	
+	public int getRownum() {
+		return rownum;
+	}
+	public void setRownum(int rownum) {
+		this.rownum = rownum;
+	}
 	public int getId() {
 		return id;
 	}
@@ -48,7 +55,7 @@ public class BoardVO {
 	}
 	@Override
 	public String toString() {
-		return "BoardVO [id=" + id + ", userId=" + userId + ", title=" + title + ", content=" + content + ", hit=" + hit
+		return "BoardVO [rownum="+rownum+", id=" + id + ", userId=" + userId + ", title=" + title + ", content=" + content + ", hit=" + hit
 				+ ", regDate=" + regDate + "]";
 	}
 	

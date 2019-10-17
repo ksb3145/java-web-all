@@ -2,6 +2,7 @@ package board.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
@@ -74,6 +75,7 @@ public class BoardServlet extends HttpServlet {
 				resultData.put("searchType", searchType);
 				params.put("searchType",searchType);
 				location += "&searchType="+searchType;
+				url += "&searchType="+searchType;
 			}
 			if(keyword != ""){
 				resultData.put("keyword", keyword);
@@ -130,14 +132,13 @@ public class BoardServlet extends HttpServlet {
 			resultData.put("totalCnt", totalCnt);
 			resultData.put("page", page);
 			resultData.put("paging", paging);
-			
 			params.put("page", page);
 			params.put("limit", limit);
 			params.put("offset", offset);
 			
 			req.setAttribute("boardList", service.getBBSList(params));
-			req.setAttribute("code", "OK");
-			req.setAttribute("msg", "게시판 조회 성공");
+			//req.setAttribute("code", "OK");
+			//req.setAttribute("msg", "게시판 조회 성공");
 			req.setAttribute("resultData", resultData);
 			
 			location= "/WEB-INF/views/board/list.jsp";
@@ -145,61 +146,83 @@ public class BoardServlet extends HttpServlet {
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			
+		}else if(command.equals("bbsWriteForm")){	
+			// 게시글 입력양식
 			
-		}else if(command.equals("bbsWriteView")){	// 게시글 입력화면
+			BoardVO bvo = null;
+			String no 		= (req.getParameter("boardId") == null) ? "" 	: req.getParameter("boardId");
+			String reqFrm	= (req.getParameter("reqFrm") == null) ? "" 	: req.getParameter("reqFrm");	//요청양식(수정 or 답글)
+			String pid		= (req.getParameter("pid") == null) ? "" 		: req.getParameter("pid");		//답글 부모키
 			
-			
-			String no = (req.getParameter("boardId") == null) ? "" : req.getParameter("boardId");
-			String userId = (req.getParameter("userId") == null) ? "" : req.getParameter("userId");
-			
-			if( no != "" && userId != ""){
+			// 수정+답글
+			if("" != reqFrm){
 				int boardId = Integer.parseInt(no);	// 게시판id
-				// 게시글 조회
-				BoardVO bvo = new BoardVO();
+				
+				bvo = new BoardVO();
 				bvo = service.getBBSView(boardId);
 				
 				req.setAttribute("page", page);
+				req.setAttribute("reTitle", "RE: "+bvo.getTitle() );
+				req.setAttribute("reqFrm", reqFrm );
+				req.setAttribute("boardId", bvo.getId());
+				req.setAttribute("pid", bvo.getPid());
+				
 				req.setAttribute("boardDetail", bvo );
 			}
+			
 			
 			location= "/WEB-INF/views/board/write.jsp";
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			
-			
-		}else if(command.equals("bbsInsert")){	// 게시글 등록
-			
-			
-			String userId = req.getParameter("userId");
-			String title = req.getParameter("title");
-			String content = req.getParameter("content");
+		}else if(command.equals("bbsInsert")){	
+			// 게시글 등록
+			int result = 0, group = 0;
+			String reqFrm 	= req.getParameter("reqFrm");	// 게시글 or 답변 수정
+			String boardId 	= req.getParameter("boardId");	// 개시글 key (답글일 경우)
+			String userId 	= req.getParameter("userId");
+			String title 	= req.getParameter("title");
+			String content 	= req.getParameter("content");
+			String bGroup 	= (req.getParameter("bGroup") == null) ? "" : req.getParameter("bGroup");
 			
 			BoardVO bvo = new BoardVO();
 			bvo.setUserId(userId);
 			bvo.setTitle(title);
 			bvo.setContent(content);
 			
-			int result = service.setBBSInsert(bvo);
+			if(boardId != "" && reqFrm.equals("bbsReplyInsert")){ 
+				int pid = Integer.parseInt(boardId);
+				
+				group = Integer.parseInt(bGroup);
+				bvo.setPid(pid);
+				bvo.setbGroup(group);
+				result = service.setBBSReInsert(bvo);
+			}else{
+				group = service.setBBSInsert(bvo);
+				if(0<group){
+					result = service.setGroupNOUpdate(group,group);	// setGroupNOUpdate(int cId, int group)
+				}
+			}
+			
+			
 			
 			if(result>0){
 				// 등록 성공
 				location = "/BoardServlet?command=bbsList&page="+page;
-				req.setAttribute("code", "OK");
+				//req.setAttribute("code", "OK");
 				req.setAttribute("msg", "등록 성공");	
 				
 			}else{
 				// 등록 실패
 				location = "/BoardServlet?command=bbsWrite&page="+page;
-				req.setAttribute("code", "Fail");
+				//req.setAttribute("code", "Fail");
 				req.setAttribute("msg","등록 실패!");
 			}
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
-			
-			
-		}else if(command.equals("bbsUpdate")){	//게시글 수정
-			
+		}else if(command.equals("bbsUpdate")){	
+			//게시글 수정
 			
 			String no = req.getParameter("boardId");
 			String userId = req.getParameter("userId");
@@ -224,12 +247,12 @@ public class BoardServlet extends HttpServlet {
 				// 등록 실패
 				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
 			}
+			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			
-			
-		}else if(command.equals("bbsDelete")){	// 게시글 삭제
-			
+		}else if(command.equals("bbsDelete")){	
+			// 게시글 삭제
 			
 			String boardId = req.getParameter("boardId");
 			String userId = req.getParameter("userId");
@@ -247,10 +270,8 @@ public class BoardServlet extends HttpServlet {
 		    
 		    PrintWriter out = resp.getWriter();
 		    out.print(json);
-			
 		    
 		}else if(command.equals("bbsView")){
-			
 			
 			String no = req.getParameter("no");
 			int boardId = Integer.parseInt(no);
@@ -261,14 +282,12 @@ public class BoardServlet extends HttpServlet {
 			CommentService cmtService = new CommentService();
 			req.setAttribute("commentList", cmtService.getCommentList(boardId) );
 			req.setAttribute("page", page);
-			req.setAttribute("code", "OK");
-			req.setAttribute("msg", "게시판 조회 성공");
+			//req.setAttribute("code", "OK");
+			//req.setAttribute("msg", "게시판 조회 성공");
 			
 			location= "/WEB-INF/views/board/view.jsp";
-			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
-			
 		}
 //		// 코드 지우기
 //		else if(command.equals("session_print")){
@@ -282,6 +301,18 @@ public class BoardServlet extends HttpServlet {
 //				System.out.println("ss_name [ "+s_name+" ], ss_val[ "+s_val+ " ]");
 //			}
 //		}
+	}
+	
+	public String getUrl(HttpServletRequest req){
+		// request URL
+        Enumeration param = req.getParameterNames();
+        String strParam = "";
+        while(param.hasMoreElements()) {
+            String name = (String)param.nextElement();
+            String value = req.getParameter(name);
+            strParam += name + "=" + value + "&";
+        }
+        return req.getRequestURL() + "?" + strParam;
 	}
 
 }

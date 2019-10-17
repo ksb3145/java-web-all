@@ -78,31 +78,29 @@
 				</table>
 				
 				<div class="col-md-12">
-					<c:choose>
-						<c:when test="${sessionVO.userId eq boardDetail.userId}" >
-							<form name="bFrm" action="/BoardServlet?command=bbsWriteView" method="post" >
-						</c:when>
-						<c:otherwise>
-							<!-- 답글 주소고고! -->
-							<form name="bFrm" action="/BoardServlet?command=bbsReplyView" method="post" >
-						</c:otherwise>
-					</c:choose>
+					<form name="bFrm" action="/BoardServlet?command=bbsWriteForm" method="post" >
 						<input type="hidden" name="page" value="${page}" />
+						<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
+						<input type=hidden id="userId" name="userId" value="${sessionVO.userId}" />
+						
 						<ul class="list-inline">
 							<li>
 								<a href="/BoardServlet?command=bbsList&page=${page}" class="btn lg gray">목록</a>
 							</li>
 							<li class="float-r">
 								<c:if test="${sessionVO.userId eq boardDetail.userId}">
-									<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
-									<input type=hidden id="userId" name="userId" value="${sessionVO.userId}" />
+									<c:if test="${not empty boardDetail.pid}">
+										<input type="hidden" id="reqFrm" name="reqFrm" value="bbsUpdateForm" />
+									</c:if>
 									<button type="submit" class="btn lg green">수정</button>
 								    <button type="button" class="btn lg red delBtn" data-command="bbsDelete">삭제</button>
 								</c:if>
-								
-								<c:if test="${sessionVO.userId ne boardDetail.userId}">
-									<button type="button" class="btn lg green" data-command="bbsDelete">답글</button>
+
+								<c:if test="${sessionVO.userId ne boardDetail.userId && boardDetail.pid eq 0}">
+									<input type="hidden" id="reqFrm" name="reqFrm" value="insert" />
+									<button type="submit" class="btn lg green" >답글</button>
 								</c:if>
+								
 							</li>
 						</ul>
 					</form>

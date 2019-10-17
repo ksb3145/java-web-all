@@ -42,10 +42,10 @@ public class LoginServlet extends HttpServlet {
 			
 			String location = "";
 			String command = req.getParameter("command");
-			
 			HttpSession session = req.getSession();
 			
-			if(command.equals("home")){
+			
+			if(command.equals("home")){ 
 				
 				SessionVO sVo = (SessionVO)session.getAttribute("sessionVO");
 				
@@ -58,10 +58,7 @@ public class LoginServlet extends HttpServlet {
 				RequestDispatcher rd = req.getRequestDispatcher(location);
 				rd.forward(req, resp);
 				
-				//System.out.println();
-				
 			}else if( command.equals("login") ) {
-				System.out.println("로그인");
 				
 				String userId = req.getParameter("userId");
 				String userPw = req.getParameter("userPw");
@@ -76,49 +73,43 @@ public class LoginServlet extends HttpServlet {
 					svo.setUserName(mvo.getUserName());
 					svo.setUserEmail(mvo.getUserEmail());
 					
-					req.setAttribute("code", "OK");
-					req.setAttribute("msg", "로그인 성공");
 					session.setAttribute("sessionVO", svo);
 					
-					System.out.println("로그인 성공");
+					//req.setAttribute("code", "OK");
+					//req.setAttribute("msg", "로그인 성공");
 					
 				} else {
 					location = "/WEB-INF/views/member/login.jsp";
-					
-					req.setAttribute("code", "Fail");
+					//req.setAttribute("code", "Fail");
 					req.setAttribute("msg", "로그인 실패");
-					
-					System.out.println("로그인 실패");
 				}
 				
 				RequestDispatcher rd = req.getRequestDispatcher(location);
 				rd.forward(req, resp);
+				
 			}else if ( command.equals("logout") ) {
 				
 				session = req.getSession(false); // 이미 세션이 있다면 그 세션을 돌려주고, 세션이 없으면 null을 돌려준다.
 				if(session!=null){
 					session.invalidate(); // 세션값 초기화
 				}else{
-					System.out.println("로그아웃 실패");
+					req.setAttribute("msg", "로그아웃 실패");
 				}
 				
-				location = "/loginServlet?command=home";
-				
+				location = "/loginServlet?command=home";				
 				RequestDispatcher rd = req.getRequestDispatcher(location);
 				rd.forward(req, resp);
 				
 			} else if ( command.equals("joinForm") ) {
-				System.out.println("회원가입 양식...");
+				// 회원가입양식
 				
 				location = "/WEB-INF/views/member/join.jsp";
-				
 				RequestDispatcher rd = req.getRequestDispatcher(location);
 				rd.forward(req, resp);
 				
 			} else if ( command.equals("join") ) {
-				System.out.println("회원가입...");
+				// 회원가입
 				
-				// 회원가입 처리
 				String userId = req.getParameter("userId");
 				String userPw = req.getParameter("userPw");
 				String userName = req.getParameter("userName");
@@ -134,26 +125,23 @@ public class LoginServlet extends HttpServlet {
 				
 				MemberVO resultVO = service.join(mvo);
 				
-				
 				if(null != resultVO){
 					// 가입성공
 					location = "/WEB-INF/views/common/home.jsp";
+					session.setAttribute("sessionVO", resultVO);
 					
-					req.setAttribute("code", "OK");
+					//req.setAttribute("code", "OK");
 					req.setAttribute("msg", "로그인 성공");
-					session.setAttribute("sessionVO", resultVO);	
-					
+						
 				}else{
 					// 가입실패
 					location = "/WEB-INF/views/member/login.jsp";
 					
-					req.setAttribute("code", "Fail");
+					//req.setAttribute("code", "Fail");
 					req.setAttribute("msg","가입 실패!");
 				}
-				
 				RequestDispatcher rd = req.getRequestDispatcher(location);
 				rd.forward(req, resp);
-				
 			}
 		}
 

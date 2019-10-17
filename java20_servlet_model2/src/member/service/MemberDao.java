@@ -19,7 +19,7 @@ public class MemberDao {
 	public void insertMember( MemberVO mvo ){
 		PreparedStatement pstmt = null;
 		
-		String sql = "insert into mvc_member (mUserId, mUserPw, mUserName, mUserEmail) values (?,?,?,?);";
+		String sql = "INSERT INTO mvc_member (mUserId, mUserPw, mUserName, mUserEmail, mRegdate) VALUES (?,?,?,?,now());";
 		
 		try{	
 			
@@ -58,7 +58,10 @@ public class MemberDao {
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		
-		String sql = "select mId, mUserId, mUserPw, mUserName, mUserEmail from mvc_member where mUserId = ?";
+		
+		String sql = "SELECT mId, mUserId, mUserPw, mUserName, mUserEmail FROM mvc_member WHERE mUserId = ?";
+		
+		System.out.println(id +"//////"+sql);
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();

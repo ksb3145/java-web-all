@@ -1,13 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <jsp:include page="../common/header.jsp" flush="false"></jsp:include>
-	
-	
 	<div class="row">
 		<div class="col-md-4 col-sm-2"></div>
 		<div class="col-md-4 col-sm-8">
 			<h4>LOGIN</h4>
-			
 			<form id="frm" action="/loginServlet" method="post">
 				<input type="hidden" name="command" value="login">
 				
@@ -23,13 +20,8 @@
 				<div class="col-md-12 text-center">
 					<button type="submit" class="btn btn-primary">로그인</button>
 				</div>
-				
 			</form>
-			
 		</div>
 		<div class="col-md-4 col-sm-2"></div>
 	</div>
-	
-	
 <jsp:include page="../common/footer.jsp" flush="false"></jsp:include>
-

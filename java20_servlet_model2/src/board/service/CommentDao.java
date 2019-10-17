@@ -22,8 +22,8 @@ public class CommentDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		String sql  = "INSERT INTO mvc_comment( bid, cmtGroup, pid, sort, depth, contents, mUserId) "; 
-			   sql += "VALUES (	?, 	?,	?,	?,	?,	?,	?)";
+		String sql  = "INSERT INTO mvc_comment( bid, cmtGroup, pid, sort, depth, contents, mUserId, regdate) "; 
+			   sql += "VALUES ( ?, 	?,	?,	?,	?,	?,	?, now())";
 		
 		try{	
 			DBconn.dbConn = DBconn.getConnection();
@@ -190,10 +190,11 @@ public class CommentDao {
 		   		  sql +=	 " FROM mvc_comment t1";
 		   		  sql +=" LEFT JOIN mvc_comment t2";
 		   		  sql +=	   " ON t1.cid = t2.pid";
-		   		  sql +=	" WHERE t1.delYN='N' AND bid = "+bId;
+		   		  sql +=	" WHERE t1.delYN='N' AND t1.bid = "+bId;
 		   		  sql += " GROUP BY t1.cid";
 		   		  sql += " ORDER BY t1.cmtGroup ASC, t1.sort ASC, t1.regdate ASC";
 		
+		   		  System.out.println(sql);
 		try{
 			DBconn.dbConn = DBconn.getConnection();
 			

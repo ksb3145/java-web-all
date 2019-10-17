@@ -11,6 +11,9 @@ public class BoardVO {
 	private int hit;		// 조회수
 	private Date regDate;	// 작성일
 	
+	private int pid;		// 부모 개시글 key
+	private int bGroup;		
+	
 	public int getRownum() {
 		return rownum;
 	}
@@ -53,10 +56,21 @@ public class BoardVO {
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
 	}
+	public int getPid() {
+		return pid;
+	}
+	public void setPid(int pid) {
+		this.pid = pid;
+	}
+	public int getbGroup() {
+		return bGroup;
+	}
+	public void setbGroup(int bGroup) {
+		this.bGroup = bGroup;
+	}
 	@Override
 	public String toString() {
-		return "BoardVO [rownum="+rownum+", id=" + id + ", userId=" + userId + ", title=" + title + ", content=" + content + ", hit=" + hit
-				+ ", regDate=" + regDate + "]";
+		return "BoardVO [rownum=" + rownum + ", id=" + id + ", userId=" + userId + ", title=" + title + ", content="
+				+ content + ", hit=" + hit + ", regDate=" + regDate + ", pid=" + pid + ", bGroup=" + bGroup + "]";
 	}
-	
 }

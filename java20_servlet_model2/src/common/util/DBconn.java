@@ -23,7 +23,9 @@ public class DBconn {
 			
 			Class.forName(driverName);
 			System.out.println("드라이버 로드 ...");
+			
 			dbConn = DriverManager.getConnection(url, id, pw);
+			
 			System.out.println("DB 연결 성공 ...");
 		}
 		
@@ -32,12 +34,14 @@ public class DBconn {
 	
 	// close
 	public static void close() throws SQLException{
+		
 		if(dbConn!=null){
 			System.out.println("conn닫기 ...");
 			if(!dbConn.isClosed()){
 				dbConn.close();
 			}
 		}
+		
 		dbConn = null;
 	}
 }

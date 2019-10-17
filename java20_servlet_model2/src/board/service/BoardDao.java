@@ -25,7 +25,11 @@ public class BoardDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent) VALUES ( ?, ?, ?);";
+		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent, bRegdate) VALUES ( ?, ?, ?, now());";
+		
+		System.out.println("::::게시글 등록::::");
+		System.out.println(sql);
+		System.out.println(bvo.toString());
 		
 		try{
 			
@@ -35,6 +39,55 @@ public class BoardDao {
 			pstmt.setString(1, bvo.getUserId());
 			pstmt.setString(2, bvo.getTitle());
 			pstmt.setString(3, bvo.getContent());
+			
+			result = pstmt.executeUpdate();
+			
+			ResultSet rs = pstmt.executeQuery("SELECT LAST_INSERT_ID()");
+			
+			if(rs.next()){
+				result = rs.getInt(1);
+			}
+			
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			
+			try{
+				if( null != pstmt) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try{
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	// 답글 등록
+	public int insertBoardRe(BoardVO bvo){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql = "INSERT INTO mvc_board (pId, bGroup, mUserId, bTitle, bContent, bRegdate) VALUES (?, ?, ?, ?, ?, now());";
+		
+		System.out.println("::::답글등록::::");
+		System.out.println(sql);
+		System.out.println(bvo.toString());
+		try{
+			
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, bvo.getId());
+			pstmt.setInt(2, bvo.getbGroup());
+			pstmt.setString(3, bvo.getUserId());
+			pstmt.setString(4, bvo.getTitle());
+			pstmt.setString(5, bvo.getContent());
 			
 			result = pstmt.executeUpdate();
 			
@@ -229,10 +282,48 @@ public class BoardDao {
 		return result;
 	}
 	
+	// 게시글 그룹 업데이트
+	public int setGroupNOUpdate(int bId, int group){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql  = "UPDATE mvc_board";
+			   sql +=   " SET bGroup = ?";
+			   sql += " WHERE bid = ?";
+		
+		try{	
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, bId);
+			pstmt.setInt(2, group);
+			
+			result = pstmt.executeUpdate();
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
 	// 게시글 상세
 	public BoardVO selectView(int bId){
 	
-		String sql = "SELECT bId, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board WHERE bid=?;";
+		String sql = "SELECT bId, pId, bGroup, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board WHERE bid=?;";
 	
 	 	PreparedStatement pstmt = null;
 	 	BoardVO bvo = null;	//리턴할 객체참조변수
@@ -252,6 +343,8 @@ public class BoardDao {
 				bvo.setContent(rs.getString("bContent"));
 				bvo.setRegDate(rs.getDate("bRegDate"));
 				bvo.setId(rs.getInt("bId"));
+				bvo.setPid(rs.getInt("pId"));
+				bvo.setbGroup(rs.getInt("bGroup"));
 				bvo.setUserId(rs.getString("mUserId"));
 			}
 		} catch (SQLException e) {

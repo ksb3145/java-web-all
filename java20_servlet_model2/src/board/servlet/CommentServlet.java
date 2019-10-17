@@ -42,7 +42,7 @@ public class CommentServlet extends HttpServlet {
 		String command = req.getParameter("command");
 		
 		if(command.equals("commentInsert")){
-			System.out.println("코벤트 등록..");
+			// 코멘트 등록 (ajax/json)
 			
 			String resultCode 	= "OK"; // 결과코드
 			String boardId		= req.getParameter("boardId");	// 게시글
@@ -77,13 +77,12 @@ public class CommentServlet extends HttpServlet {
 			
 			if(cId == 0){
 				resultCode = "Fail";
-			}else if(group==0){
+			}else if(group==0 && cId>0){
 				// group==0 원글..   [ group값 last_insert_ID ]
 				// 원글 (댓글 기준)
 				int result = service.setGroupNOUpdate(cId,cId);	// setGroupNOUpdate(int cId, int group)
 				if(result == 0) resultCode = "Fail";
 			}
-			
 			
 			
 			JSONObject json = new JSONObject(); 

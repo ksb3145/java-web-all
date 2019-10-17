@@ -9,29 +9,36 @@
 			<h4>글쓰기</h4>
 			<!-- form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data"-->
 			<form class="form-horizontal" action="/BoardServlet" method="post" >
-				
+			<input type="text" id="bGroup" name="bGroup" value="${boardDetail.bGroup}" />
+			
+				${reqFrm}
+				${boardDetail.id }
 				<c:choose>
-					<c:when test="${not empty boardDetail.id}" >
-						<input type="hidden" id="command" name="command" value="bbsUpdate" />
-						<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
-						<input type="hidden" id="userId" name="userId" value="${boardDetail.userId}}" />
-						<input type="hidden" id="page" name="page" value="${page}" />
+					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
+						<input type="text" id="command" name="command" value="bbsUpdate" />
+						<input type="text" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyUpdate' : 'bbsUpdate'}" />
+						<input type="text" id="boardId" name="boardId" value="${boardDetail.id}" />
+						<input type="text" id="userId" name="userId" value="${boardDetail.userId}" />
+						<input type="text" id="page" name="page" value="${page}" />
 					</c:when>
 					<c:otherwise>
-						<input type="hidden" id="command" name="command" value="bbsInsert" />
-						<input type="hidden" id="userId" name="userId" value="${sessionVO.userId}" />
+						<input type="text" id="command" name="command" value="bbsInsert" />
+						<input type="text" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyInsert' : ''}" />
+						<input type="text" id="userId" name="userId" value="${sessionVO.userId}" />
+						<input type="text" id="boardId" name="boardId" value="${boardId}" />
 					</c:otherwise>
 				</c:choose>
 				
 				
 				<div class="form-group">
 					<label for="title">제목</label>
-					<input type="text" class="form-control" id="title" name="title" value="${boardDetail.title}" placeholder="아이디를 입력하세요." />
+					
+					<input type="text" class="form-control" id="title" name="title" value="${reqFrm eq 'insert' ? reTitle : boardDetail.title} " placeholder="아이디를 입력하세요." />
 				</div>
 				
 				<div class="form-group">
 					<label for="content">내용</label>
-					<textarea class="form-control" rows="3"  id="content" name="content">${boardDetail.content}</textarea>
+					<textarea class="form-control" rows="3"  id="content" name="content">${reqFrm eq 'insert' ?  null : boardDetail.content}</textarea>
 				</div>
 				
 				<!-- div class="form-group">

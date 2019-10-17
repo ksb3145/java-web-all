@@ -25,6 +25,21 @@ public class BoardService {
 			return 0;
 		}
 	}
+	// 게시글 그룹 업뎃
+	public int setGroupNOUpdate(int bId, int group){
+		return boardDao.setGroupNOUpdate(bId, group);
+	}
+	
+	// 답글 등록
+	public int setBBSReInsert(BoardVO bvo){
+	
+		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
+		if (null != mvo){
+			return boardDao.insertBoardRe(bvo);
+		}else{
+			return 0;
+		}
+	}
 	
 	// 게시글 수정
 	public int setBBSUpdate(BoardVO bvo){

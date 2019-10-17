@@ -8,22 +8,22 @@
 				<div class="card md-4 shadow-sm">
 					<div class="card-body ">
 						<form name="sFrm" action="/BoardServlet" method="get">
-						<input type="text" id="command" name="command" value="bbsList" />
+						<input type="hidden" id="command" name="command" value="bbsList" />
 						
 						<ul class="list-inline">
-							<li class="col-md-2">
+							<li class="col-md-2 col-sm-2">
 								<select id="searchType" name="searchType" class="form-control">
 									<option value="">::선택하세요::</option>
-									<option <c:if test="${resultData.type eq 'bTitle'}"> selected</c:if> value="bTitle">제목</option>
-									<option <c:if test="${resultData.type eq 'mUserId'}"> selected </c:if> value="mUserId">아이디</option>
-									<option <c:if test="${resultData.type eq 'bContent'}"> selected </c:if> value="bContent">본문</option>
+									<option <c:if test="${resultData.searchType eq 'bTitle'}"> selected</c:if> value="bTitle">제목</option>
+									<option <c:if test="${resultData.searchType eq 'mUserId'}"> selected </c:if> value="mUserId">아이디</option>
+									<option <c:if test="${resultData.searchType eq 'bContent'}"> selected </c:if> value="bContent">본문</option>
 								</select>
 							</li>
-							<li class="col-md-6">
+							<li class="col-md-6 col-sm-6">
 								<input class="form-control"  type="text" name="keyword" id="keyword" value="${resultData.keyword}" placeholder="검색어를 입력하세요." />
 							</li>
-							<li class="col-md-1 vertical-top">
-								<button type="submit" >검색</button>
+							<li class="col-md-1 col-sm-3 vertical-top">
+								<button type="submit" class="btn-sm btn-primary">검색</button>
 							</li>
 						</ul>
 						</form>
@@ -61,7 +61,7 @@
 					</nav>
 				</li>
 				<li class="float-r">
-					<a href="/BoardServlet?command=bbsWriteView&page=${resultData.page}" class="btn btn-primary">글쓰기</a>
+					<a href="/BoardServlet?command=bbsWriteForm&page=${resultData.page}" class="btn btn-primary">글쓰기</a>
 				</li>
 			</ul>
 		</div>

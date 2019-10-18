@@ -27,10 +27,6 @@ public class BoardDao {
 		
 		String sql = "INSERT INTO mvc_board (mUserId, bTitle, bContent, bRegdate) VALUES ( ?, ?, ?, now());";
 		
-		System.out.println("::::게시글 등록::::");
-		System.out.println(sql);
-		System.out.println(bvo.toString());
-		
 		try{
 			
 			DBconn.dbConn = DBconn.getConnection();
@@ -73,23 +69,27 @@ public class BoardDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		String sql = "INSERT INTO mvc_board (pId, bGroup, mUserId, bTitle, bContent, bRegdate) VALUES (?, ?, ?, ?, ?, now());";
+		String sql   = "INSERT INTO mvc_board (pId, bGroup, bSort, mUserId, bTitle, bContent, bRegdate) VALUES (?, ?, ?, ?, ?, ?, now());";
 		
-		System.out.println("::::답글등록::::");
-		System.out.println(sql);
-		System.out.println(bvo.toString());
 		try{
 			
 			DBconn.dbConn = DBconn.getConnection();
 			
 			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, bvo.getId());
+			pstmt.setInt(1, bvo.getPid());
 			pstmt.setInt(2, bvo.getbGroup());
-			pstmt.setString(3, bvo.getUserId());
-			pstmt.setString(4, bvo.getTitle());
-			pstmt.setString(5, bvo.getContent());
+			pstmt.setInt(3, bvo.getbSort());
+			pstmt.setString(4, bvo.getUserId());
+			pstmt.setString(5, bvo.getTitle());
+			pstmt.setString(6, bvo.getContent());
 			
 			result = pstmt.executeUpdate();
+			
+			ResultSet rs = pstmt.executeQuery("SELECT LAST_INSERT_ID()");
+			
+			if(rs.next()){
+				result = rs.getInt(1);
+			}
 			
 		}catch( SQLException e ) {
 			e.printStackTrace();
@@ -111,6 +111,7 @@ public class BoardDao {
 		}
 		return result;
 	}
+	
 	
 	// 게시판 총 카운트
 	public int resultTotalCnt(HashMap<Object, Object> params){
@@ -190,10 +191,10 @@ public class BoardDao {
 		sql += " FROM mvc_board B";
 		sql += " WHERE (@rownum:="+offset+")="+offset;
 		sql +=  where;
-		sql += " ORDER BY bRegdate DESC";
+		sql += " ORDER BY bGroup ASC, bSort DESC, bRegdate DESC ";
 		sql += " LIMIT "+offset+","+limit;
 		
-		System.out.println("BoardDao list Sql ::: "+sql);
+		// System.out.println("BoardDao list Sql ::: "+sql);
 		
 		try{
 			
@@ -282,21 +283,60 @@ public class BoardDao {
 		return result;
 	}
 	
-	// 게시글 그룹 업데이트
-	public int setGroupNOUpdate(int bId, int group){
+	// 그룹넘 업뎃
+	public int setGroupNOUpdate(BoardVO bvo){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql = "UPDATE mvc_board SET bGroup = ? WHERE bId = ?";
+		
+		System.out.println(sql);
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, bvo.getbGroup());
+			pstmt.setInt(2, bvo.getId());
+			result = pstmt.executeUpdate();
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	//setSortNOUpdate
+	public int setSortNOUpdate(BoardVO bvo){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
 		String sql  = "UPDATE mvc_board";
-			   sql +=   " SET bGroup = ?";
-			   sql += " WHERE bid = ?";
+			   sql +=   " SET bSort = (bSort+1)";
+			   sql += " WHERE bid != ? ";
+			   sql += " AND bGroup = ?";
 		
 		try{	
 			DBconn.dbConn = DBconn.getConnection();
 			
 			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, bId);
-			pstmt.setInt(2, group);
+			pstmt.setInt(1, bvo.getId());
+			pstmt.setInt(1, bvo.getbGroup());
 			
 			result = pstmt.executeUpdate();
 		}catch( SQLException e ) {

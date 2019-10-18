@@ -26,8 +26,13 @@ public class BoardService {
 		}
 	}
 	// 게시글 그룹 업뎃
-	public int setGroupNOUpdate(int bId, int group){
-		return boardDao.setGroupNOUpdate(bId, group);
+	public int setGroupNOUpdate(BoardVO bvo){
+		return boardDao.setGroupNOUpdate(bvo);
+	}
+	// 게시글 특정 그룹별 순서 증가
+	public int setSortNOUpdate(BoardVO bvo){
+		System.out.println(bvo.toString());
+		return boardDao.setSortNOUpdate(bvo);
 	}
 	
 	// 답글 등록

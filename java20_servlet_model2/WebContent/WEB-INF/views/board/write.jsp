@@ -9,10 +9,6 @@
 			<h4>글쓰기</h4>
 			<!-- form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data"-->
 			<form class="form-horizontal" action="/BoardServlet" method="post" >
-			<input type="text" id="bGroup" name="bGroup" value="${boardDetail.bGroup}" />
-			
-				${reqFrm}
-				${boardDetail.id }
 				<c:choose>
 					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
 						<input type="text" id="command" name="command" value="bbsUpdate" />
@@ -26,6 +22,7 @@
 						<input type="text" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyInsert' : ''}" />
 						<input type="text" id="userId" name="userId" value="${sessionVO.userId}" />
 						<input type="text" id="boardId" name="boardId" value="${boardId}" />
+						<input type="text" id="bGroup" name="bGroup" value="${0 eq boardDetail.bGroup ? boardDetail.id : boardDetail.bGroup}" />
 					</c:otherwise>
 				</c:choose>
 				

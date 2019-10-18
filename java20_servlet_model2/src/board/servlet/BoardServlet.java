@@ -156,13 +156,13 @@ public class BoardServlet extends HttpServlet {
 			
 			// 수정+답글
 			if("" != reqFrm){
-				int boardId = Integer.parseInt(no);	// 게시판id
+				int boardId = Integer.parseInt(no);	// 게시판id.. / 답글의 부모값
 				
 				bvo = new BoardVO();
-				bvo = service.getBBSView(boardId);
+				bvo = service.getBBSView(boardId);	// 상세페이지 내용
 				
 				req.setAttribute("page", page);
-				req.setAttribute("reTitle", "RE: "+bvo.getTitle() );
+				req.setAttribute("reTitle", "RE: "+bvo.getTitle());
 				req.setAttribute("reqFrm", reqFrm );
 				req.setAttribute("boardId", bvo.getId());
 				req.setAttribute("pid", bvo.getPid());
@@ -177,7 +177,7 @@ public class BoardServlet extends HttpServlet {
 			
 		}else if(command.equals("bbsInsert")){	
 			// 게시글 등록
-			int result = 0, group = 0;
+			int result = 0, group = 0, insertId = 0;
 			String reqFrm 	= req.getParameter("reqFrm");	// 게시글 or 답변 수정
 			String boardId 	= req.getParameter("boardId");	// 개시글 key (답글일 경우)
 			String userId 	= req.getParameter("userId");
@@ -191,16 +191,25 @@ public class BoardServlet extends HttpServlet {
 			bvo.setContent(content);
 			
 			if(boardId != "" && reqFrm.equals("bbsReplyInsert")){ 
-				int pid = Integer.parseInt(boardId);
-				
+				// 답글은 원글의 그룹넘 
+				int pid = Integer.parseInt(boardId);	// 부모글의 key
 				group = Integer.parseInt(bGroup);
+				
 				bvo.setPid(pid);
 				bvo.setbGroup(group);
-				result = service.setBBSReInsert(bvo);
+				
+				insertId = service.setBBSReInsert(bvo); // 답글 등록
+				if(0<insertId){
+					bvo.setId(insertId);
+					result = service.setSortNOUpdate(bvo);
+				}
 			}else{
-				group = service.setBBSInsert(bvo);
-				if(0<group){
-					result = service.setGroupNOUpdate(group,group);	// setGroupNOUpdate(int cId, int group)
+				insertId = service.setBBSInsert(bvo);	// 게시글 등록
+				if(0<insertId){
+					// 원글 자신의 키값을 그룹 값에 넣어줌
+					bvo.setId(insertId);
+					bvo.setbGroup(insertId);
+					result = service.setGroupNOUpdate(bvo);
 				}
 			}
 			

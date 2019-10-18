@@ -4,15 +4,16 @@ import java.util.Date;
 
 public class BoardVO {
 	private int rownum;		// 게시글 번호
-	private int id;			// 게시글 key
-	private String userId;	// 작성자id
-	private String title;	// 제목
-	private String content;	// 내용
-	private int hit;		// 조회수
-	private Date regDate;	// 작성일
+	private int id;				// 게시글 key
+	private String userId;		// 작성자id
+	private String title;			// 제목
+	private String content;		// 내용
+	private int hit;				// 조회수
+	private Date regDate;		// 작성일
 	
-	private int pid;		// 부모 개시글 key
+	private int pid;				// 부모 개시글 key
 	private int bGroup;		
+	private int bSort;
 	
 	public int getRownum() {
 		return rownum;
@@ -68,9 +69,11 @@ public class BoardVO {
 	public void setbGroup(int bGroup) {
 		this.bGroup = bGroup;
 	}
-	@Override
-	public String toString() {
-		return "BoardVO [rownum=" + rownum + ", id=" + id + ", userId=" + userId + ", title=" + title + ", content="
-				+ content + ", hit=" + hit + ", regDate=" + regDate + ", pid=" + pid + ", bGroup=" + bGroup + "]";
+	public int getbSort() {
+		return bSort;
 	}
+	public void setbSort(int bSort) {
+		this.bSort = bSort;
+	}
+	
 }

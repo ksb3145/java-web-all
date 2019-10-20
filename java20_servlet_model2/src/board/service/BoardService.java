@@ -17,7 +17,7 @@ public class BoardService {
 	}
 	
 	// 게시글 등록
-	public int setBBSInsert(BoardVO bvo){
+	public int boardInsert(BoardVO bvo){
 		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
 		if (null != mvo){
 			return boardDao.insertBoard(bvo);
@@ -26,17 +26,17 @@ public class BoardService {
 		}
 	}
 	// 게시글 그룹 업뎃
-	public int setGroupNOUpdate(BoardVO bvo){
-		return boardDao.setGroupNOUpdate(bvo);
+	public int boardGroupNOUpdate(BoardVO bvo){
+		return boardDao.groupNOUpdate(bvo);
 	}
 	// 게시글 특정 그룹별 순서 증가
-	public int setSortNOUpdate(BoardVO bvo){
+	public int boardSortNOUpdate(BoardVO bvo){
 		System.out.println(bvo.toString());
-		return boardDao.setSortNOUpdate(bvo);
+		return boardDao.sortNOUpdate(bvo);
 	}
 	
 	// 답글 등록
-	public int setBBSReInsert(BoardVO bvo){
+	public int boardReInsert(BoardVO bvo){
 	
 		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
 		if (null != mvo){
@@ -47,7 +47,7 @@ public class BoardService {
 	}
 	
 	// 게시글 수정
-	public int setBBSUpdate(BoardVO bvo){
+	public int boardUpdate(BoardVO bvo){
 		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
 		if (null != mvo){
 			return boardDao.updateBoard(bvo);
@@ -56,18 +56,28 @@ public class BoardService {
 		}
 	}
 	
+	// 게시글 삭제
+	public int boardDel(BoardVO bvo){
+		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
+		if (null != mvo){
+			return boardDao.boardDel(bvo.getId());
+		}else{
+			return 0;
+		}
+	}
+	
 	// 조회한 데이터 row count
-	public int resultTotalCnt(HashMap<Object, Object> params){
+	public int boardTotalCnt(HashMap<Object, Object> params){
 		return boardDao.resultTotalCnt(params);
 	}
 	
 	// 게시판 리스트
-	public List<BoardVO> getBBSList(HashMap<Object, Object> params){
+	public List<BoardVO> boardList(HashMap<Object, Object> params){
 		return boardDao.selectBoard(params);	
 	}
 	
 	// 게시판 상세페이지
-	public BoardVO getBBSView(int boardId){
+	public BoardVO boardView(int boardId){
 		return boardDao.selectView(boardId);
 	}
 }

@@ -142,7 +142,9 @@
 											<dd>
 												${obj.userId} <span class="date">${obj.regdate}</span>
 												<c:if test="${sessionVO.userId == obj.userId}">	
-												<span class="delBtn btn sm red" data-cid="${obj.cId}" data-command="cmtDelete">삭제</span>
+													${obj.cId}/${obj.pId}/${obj.depth}
+													<br/>
+													<span class="delBtn btn sm red" data-cid="${obj.cId}" data-depth="${obj.depth}" data-command="cmtDelete">삭제</span>
 												</c:if>
 												<span class="reComment btn sm black mgReset" data-cid="${obj.cId}" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>
 												<p>${obj.contents}</p>  	
@@ -219,49 +221,33 @@
 		
 		//게시글 삭제
 		$(".delBtn").on("click",function(e){
+			var url = "", data = "";
 			var command = $(this).attr("data-command");
-			var url;
 	    	var boardId = $("#boardId").val();
 	    	var userId 	= $("#userId").val();
 	    	
 			if(command == "bbsDelete"){
-				url = "/BoardServlet";	
-			}else if(command == ""){
-				url	= "/BoardServlet";
+				// 게시글 삭제 : boardId 값으로 게시글 + (게시글키값으로) 코멘트 삭제
+				url = "/BoardServlet";
+				data = { command:command, boardId:boardId, userId:userId };
+			}else if(command == "cmtDelete"){
+				// 코멘트 삭제
+				var cmtId = $(this).data("cid");
+				var cmtDepth = $(this).data("depth");
+				
+				url	= "/CommentServlet";
+				data = { command:command, boardId:boardId, userId:userId, cmtId:cmtId, cmtDepth:cmtDepth  };
 			}
 			
 			
-	    	
 			
+			console.log(data,url);
+			
+			if(confirm("정말 삭제하시겠습니까?")){
+				callAjax(data, url);
+			}
 		});
 	});
-	
-	function BBSDel(){
-		var url 		= "/BoardServlet";
-    	var command 	= "bbsDelete";
-    	var boardId 	= $("#boardId").val();
-    	var userId 		= $("#userId").val();
-    	
-    	var data = { command: command, boardId: boardId, userId: userId };
-    	
-    	if(confirm("정말 삭제하시겠습니까?")){
-			callAjax(data, url);
-		}
-	}
-	
-	function cmtDel(){
-		var url 		= "/BoardServlet";
-    	var command 	= "cmtDelete";
-    	var boardId 	= $("#boardId").val();
-    	var userId 		= $("#userId").val();
-    	
-    	var data = { command: command, boardId: boardId, userId: userId };
-    	
-    	if(confirm("정말 삭제하시겠습니까?")){
-			callAjax(data, url);
-		}
-	
-	}
 	
 	function reCommentClose(){
 		$("#addReCommentInput").remove();
@@ -287,7 +273,13 @@
 		    	}else{
 		    		alert("실패 다시시도하세요.");		    		
 		    	}
-		    	location.reload();
+		    
+		    	if(resultData.url != undefined ){
+		    		location.href="/BoardServlet?command=bbsList";
+		    	}else{
+		    		location.reload();	
+		    	}
+		    	
 		    },
 		    error:function(request,status,error){
 		    	alert("등록실패 다시시도하세요.");

@@ -123,10 +123,10 @@ public class BoardDao {
 		String searchType 	= (params.get("searchType") == null) 	? "" : (String) params.get("searchType"); 	// 검색타입
 		String keyword		= (params.get("keyword") == null) 		? "" : (String) params.get("keyword"); 		// 검색어
 		
-		if(searchType != "" && keyword != "") where += " WHERE "+searchType+" LIKE '"+keyword+"%'";
+		if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '"+keyword+"%'";
 		
 		
-		String sql="SELECT count(*) totalCnt FROM mvc_board "+ where;
+		String sql="SELECT count(*) totalCnt FROM mvc_board WHERE bDelYN = 'N'"+ where;
 		System.out.println(sql);
 		//검색
 
@@ -190,8 +190,9 @@ public class BoardDao {
 		sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
 		sql += " FROM mvc_board B";
 		sql += " WHERE (@rownum:="+offset+")="+offset;
+		sql += " AND B.bDelYN='N' ";
 		sql +=  where;
-		sql += " ORDER BY bGroup ASC, bSort DESC, bRegdate DESC ";
+		sql += " ORDER BY bGroup DESC, bSort DESC ";
 		sql += " LIMIT "+offset+","+limit;
 		
 		// System.out.println("BoardDao list Sql ::: "+sql);
@@ -284,7 +285,7 @@ public class BoardDao {
 	}
 	
 	// 그룹넘 업뎃
-	public int setGroupNOUpdate(BoardVO bvo){
+	public int groupNOUpdate(BoardVO bvo){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
@@ -321,8 +322,7 @@ public class BoardDao {
 		return result;
 	}
 	
-	//setSortNOUpdate
-	public int setSortNOUpdate(BoardVO bvo){
+	public int sortNOUpdate(BoardVO bvo){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
@@ -336,7 +336,7 @@ public class BoardDao {
 			
 			pstmt = DBconn.dbConn.prepareStatement(sql);
 			pstmt.setInt(1, bvo.getId());
-			pstmt.setInt(1, bvo.getbGroup());
+			pstmt.setInt(2, bvo.getbGroup());
 			
 			result = pstmt.executeUpdate();
 		}catch( SQLException e ) {
@@ -413,6 +413,45 @@ public class BoardDao {
 			
 		}
 		return bvo;
+	}
+	
+	// 게시글 삭제
+	public int boardDel(int bid){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		//String sql = "DELETE FROM mvc_board WHERE bid = ?";
+		String sql = "UPDATE mvc_board SET bDelYN = 'Y' WHERE bGroup = ?";
+		
+		System.out.println(sql);
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, bid);
+			
+			result = pstmt.executeUpdate();
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 }
 

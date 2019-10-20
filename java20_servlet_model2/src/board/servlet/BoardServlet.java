@@ -84,7 +84,7 @@ public class BoardServlet extends HttpServlet {
 			}
 			
 			
-			int totalCnt = service.resultTotalCnt(params);	// 총 게시물 수
+			int totalCnt = service.boardTotalCnt(params);	// 총 게시물 수
 			int cntPage = 10; 								// 페이지 수
 			int limit = 10;									// 게시물 수
 			int offset = (page-1)*limit; 					// (페이지번호 - 1) * 로우 출력 사이즈
@@ -136,7 +136,7 @@ public class BoardServlet extends HttpServlet {
 			params.put("limit", limit);
 			params.put("offset", offset);
 			
-			req.setAttribute("boardList", service.getBBSList(params));
+			req.setAttribute("boardList", service.boardList(params));
 			//req.setAttribute("code", "OK");
 			//req.setAttribute("msg", "게시판 조회 성공");
 			req.setAttribute("resultData", resultData);
@@ -159,7 +159,7 @@ public class BoardServlet extends HttpServlet {
 				int boardId = Integer.parseInt(no);	// 게시판id.. / 답글의 부모값
 				
 				bvo = new BoardVO();
-				bvo = service.getBBSView(boardId);	// 상세페이지 내용
+				bvo = service.boardView(boardId);	// 상세페이지 내용
 				
 				req.setAttribute("page", page);
 				req.setAttribute("reTitle", "RE: "+bvo.getTitle());
@@ -198,35 +198,32 @@ public class BoardServlet extends HttpServlet {
 				bvo.setPid(pid);
 				bvo.setbGroup(group);
 				
-				insertId = service.setBBSReInsert(bvo); // 답글 등록
+				insertId = service.boardReInsert(bvo); // 답글 등록
 				if(0<insertId){
 					bvo.setId(insertId);
-					result = service.setSortNOUpdate(bvo);
+					result = service.boardSortNOUpdate(bvo);
+					System.out.println("up:"+result);
 				}
 			}else{
-				insertId = service.setBBSInsert(bvo);	// 게시글 등록
+				insertId = service.boardInsert(bvo);	// 게시글 등록
 				if(0<insertId){
 					// 원글 자신의 키값을 그룹 값에 넣어줌
 					bvo.setId(insertId);
 					bvo.setbGroup(insertId);
-					result = service.setGroupNOUpdate(bvo);
+					result = service.boardGroupNOUpdate(bvo);
+					System.out.println("ins:"+result);
 				}
 			}
 			
-			
-			
 			if(result>0){
 				// 등록 성공
-				location = "/BoardServlet?command=bbsList&page="+page;
-				//req.setAttribute("code", "OK");
-				req.setAttribute("msg", "등록 성공");	
-				
+				req.setAttribute("msg", "성공");	
 			}else{
 				// 등록 실패
-				location = "/BoardServlet?command=bbsWrite&page="+page;
-				//req.setAttribute("code", "Fail");
-				req.setAttribute("msg","등록 실패!");
+				req.setAttribute("msg","실패!");
 			}
+			
+			location = "/BoardServlet?command=bbsList&page="+page;
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
@@ -247,7 +244,7 @@ public class BoardServlet extends HttpServlet {
 			bvo.setTitle(title);
 			bvo.setContent(content);
 			
-			int result = service.setBBSUpdate(bvo);
+			int result = service.boardUpdate(bvo);
 			
 			if(result>0){
 				// 등록 성공
@@ -262,17 +259,34 @@ public class BoardServlet extends HttpServlet {
 			
 		}else if(command.equals("bbsDelete")){	
 			// 게시글 삭제
-			
+			String resultCode = "";
 			String boardId = req.getParameter("boardId");
 			String userId = req.getParameter("userId");
 			
+			int bid = Integer.parseInt(boardId);
+			
 			BoardVO bvo = new BoardVO();
+			bvo.setId(bid);
 			bvo.setUserId(userId);
+			
+			int result = service.boardDel(bvo);
+			if(result>0){
+				CommentService cmtService = new CommentService();
+				int cmtResult = cmtService.commentBidDel(bvo.getId());
+				if(cmtResult>0){
+					resultCode = "OK";
+				}else{
+					resultCode = "Fail";
+				}
+			}else{
+				resultCode = "Fail";
+			}
 			
 			// JSONObject는 HashMap을 상속
 			JSONObject json = new JSONObject(); 
-			json.put("code", "OK");
-		    
+			json.put("code", resultCode);
+			json.put("url", "/BoardServlet?command=bbsList&page=1");
+			
 		    // 헤더설정
 		    resp.setContentType("application/json");
 		    resp.setCharacterEncoding("UTF-8");
@@ -286,10 +300,10 @@ public class BoardServlet extends HttpServlet {
 			int boardId = Integer.parseInt(no);
 			
 			// 게시판 상세페이지 조회
-			req.setAttribute("boardDetail", service.getBBSView(boardId));
+			req.setAttribute("boardDetail", service.boardView(boardId));
 			// 게시판 댓글
 			CommentService cmtService = new CommentService();
-			req.setAttribute("commentList", cmtService.getCommentList(boardId) );
+			req.setAttribute("commentList", cmtService.selectCommentList(boardId) );
 			req.setAttribute("page", page);
 			//req.setAttribute("code", "OK");
 			//req.setAttribute("msg", "게시판 조회 성공");
@@ -298,18 +312,6 @@ public class BoardServlet extends HttpServlet {
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 		}
-//		// 코드 지우기
-//		else if(command.equals("session_print")){
-//			Enumeration ee  = session.getAttributeNames();
-//			int t=0;
-//			String s_name="" , s_val="";
-//			while(ee.hasMoreElements()){
-//				t++;
-//				s_name = ee.nextElement().toString();
-//				s_val = session.getAttribute(s_name).toString();
-//				System.out.println("ss_name [ "+s_name+" ], ss_val[ "+s_val+ " ]");
-//			}
-//		}
 	}
 	
 	public String getUrl(HttpServletRequest req){

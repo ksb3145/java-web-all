@@ -8,6 +8,7 @@ import java.util.List;
 
 import board.CommentVO;
 import common.util.DBconn;
+import member.vo.MemberVO;
 
 public class CommentDao {
 	private static CommentDao instance;
@@ -18,7 +19,7 @@ public class CommentDao {
 	}
 	
 	//코멘트 등록
-	public int insertComment(CommentVO cvo){
+	public int commentInsert(CommentVO cvo){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
@@ -68,26 +69,27 @@ public class CommentDao {
 		return result;
 	}
 	
-	// 코멘트 그룹순서 증가 (정렬)
-	public int setCommentSortUp(CommentVO cvo){
-		int result = 0;
+	// 코멘트 key
+	public List<Integer> selectCommentKey(int cid){
+		List<Integer> commentCidList = new ArrayList<>();
+		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		
-		String sql = "UPDATE mvc_comment SET sort = sort+1 WHERE bid = ? AND ?<depth";
-		
+		String sql = "SELECT cId FROM mvc_comment WHERE pId=?";
+		System.out.println(sql);
 		try{
 			DBconn.dbConn = DBconn.getConnection();
+			pstmt = DBconn.dbConn.prepareStatement( sql );
+			pstmt.setInt(1,cid);
+			rs = pstmt.executeQuery();
 			
-			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, cvo.getbId());
-			pstmt.setInt(2, cvo.getDepth());
+			while(rs.next()){
+				commentCidList.add(rs.getInt("cId"));
+			}
 			
-			result = pstmt.executeUpdate();
-			
-			
-		}catch (ClassNotFoundException e) {
+		}catch ( SQLException e ) {
 			e.printStackTrace();
-		}catch (SQLException e) {
+		}catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}finally {
 			try {
@@ -97,39 +99,9 @@ public class CommentDao {
 			}
 			
 			try {
-				if(null != DBconn.dbConn) DBconn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return result;
-	}
-	
-	// 코멘트 삭제
-	public int setCommentDel(CommentVO cvo){
-		int result = 0;
-		PreparedStatement pstmt = null;
-		
-		String sql = "";
-		
-		try{
-			DBconn.dbConn = DBconn.getConnection();
-			
-			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, cvo.getbId());
-			
-			result = pstmt.executeUpdate();
-			
-		}catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				if( null != pstmt ) pstmt.close();
-			} catch ( SQLException e ) {
-				e.printStackTrace();
+				if( null != rs ) rs.close();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
 			}
 			
 			try {
@@ -138,50 +110,11 @@ public class CommentDao {
 				e.printStackTrace();
 			}
 		}
-		
-		return result;
-	}
-	
-	// 코멘트 그룹 업데이트
-	public int setGroupNOUpdate(int cId, int group){
-		int result = 0;
-		PreparedStatement pstmt = null;
-		
-		String sql  = "UPDATE mvc_comment";
-			   sql +=   " SET cmtGroup = ?";
-			   sql += " WHERE cid = ?";
-		
-		try{	
-			DBconn.dbConn = DBconn.getConnection();
-			
-			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, cId);
-			pstmt.setInt(2, group);
-			
-			result = pstmt.executeUpdate();
-		}catch( SQLException e ) {
-			e.printStackTrace();
-		}catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}finally{
-			
-			try {
-				if( null != pstmt ) pstmt.close();
-			} catch ( SQLException e ) {
-				e.printStackTrace();
-			}
-			
-			try {
-				if(null != DBconn.dbConn) DBconn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
+		return commentCidList;
 	}
 	
 	// 코멘트 리스트
-	public List<CommentVO> selectComment(int bId){
+	public List<CommentVO> selectCommentList(int bId){
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		List<CommentVO> commentList = new ArrayList<CommentVO>();
@@ -240,5 +173,160 @@ public class CommentDao {
 			}
 		}
 		return commentList;
+	}
+	
+	// 코멘트 그룹 업데이트
+	public int groupNOUpdate(int cId, int group){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql  = "UPDATE mvc_comment";
+			   sql +=   " SET cmtGroup = ?";
+			   sql += " WHERE cid = ?";
+		
+		try{	
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, cId);
+			pstmt.setInt(2, group);
+			
+			result = pstmt.executeUpdate();
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
+	// 코멘트 그룹순서 증가 (정렬)
+	public int commentSortUpdate(CommentVO cvo){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql = "UPDATE mvc_comment SET sort = sort+1 WHERE bid = ? AND ?<depth";
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, cvo.getbId());
+			pstmt.setInt(2, cvo.getDepth());
+			
+			result = pstmt.executeUpdate();
+			
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+		
+	// 코멘트 삭제(단일) ==> pId = cId
+	// selectCommentKey(int cid) 로 조회한 cid의 하위뎁스 지우기
+	public int commentDel(int cid){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		//String sql = "DELETE FROM mvc_comment WHERE pId = ?";
+		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE cid = ?";
+		
+		System.out.println(sql);
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, cid);
+			
+			result = pstmt.executeUpdate();
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	// 코멘트 삭제(그룹) ==> bid(게시글 key) = cId
+	public int commentBidDel(int cid){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		//String sql = "DELETE FROM mvc_comment WHERE cmtGroup = ?";
+		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE bid = ?";
+		System.out.println(sql);
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, cid);
+			
+			result = pstmt.executeUpdate();
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 }

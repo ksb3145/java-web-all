@@ -41,9 +41,11 @@
 					<td>작성일</td>
 				</tr>
 				
+				
+				${(resultData.page *10)+1}
 				<c:forEach var="obj" items="${boardList}">
 					<tr>
-						<td>${obj.rownum}</td>
+						<td>${resultData.offset + 1}</td>
 						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}&page=${resultData.page}">${obj.title}</a></td>
 						<td>${obj.userId}</td>
 						<td>${obj.regDate}</td>

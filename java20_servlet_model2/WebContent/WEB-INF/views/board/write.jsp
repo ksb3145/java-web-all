@@ -7,8 +7,7 @@
 	
 		<div class="col-md-12">
 			<h4>글쓰기</h4>
-			<!-- form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data"-->
-			<form class="form-horizontal" action="/BoardServlet" method="post" >
+			<form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
 				<c:choose>
 					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
 						<input type="text" id="command" name="command" value="bbsUpdate" />
@@ -38,10 +37,10 @@
 					<textarea class="form-control" rows="3"  id="content" name="content">${reqFrm eq 'insert' ?  null : boardDetail.content}</textarea>
 				</div>
 				
-				<!-- div class="form-group">
+				<div class="form-group">
 					<label for="file-upload">파일업로드</label>
 					<input type="file" class="form-control" id="file-upload" name="file-upload" />
-				</div-->
+				</div>
 				
 				<div class="col-md-12">
 					<ul class="list-inline">

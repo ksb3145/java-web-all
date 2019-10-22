@@ -6,12 +6,16 @@ import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 //import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 import net.sf.json.JSONObject;
 
@@ -176,57 +180,74 @@ public class BoardServlet extends HttpServlet {
 			rd.forward(req, resp);
 			
 		}else if(command.equals("bbsInsert")){	
-			// 게시글 등록
-			int result = 0, group = 0, insertId = 0;
-			String reqFrm 	= req.getParameter("reqFrm");	// 게시글 or 답변 수정
-			String boardId 	= req.getParameter("boardId");	// 개시글 key (답글일 경우)
-			String userId 	= req.getParameter("userId");
-			String title 	= req.getParameter("title");
-			String content 	= req.getParameter("content");
-			String bGroup 	= (req.getParameter("bGroup") == null) ? "" : req.getParameter("bGroup");
 			
-			BoardVO bvo = new BoardVO();
-			bvo.setUserId(userId);
-			bvo.setTitle(title);
-			bvo.setContent(content);
 			
-			if(boardId != "" && reqFrm.equals("bbsReplyInsert")){ 
-				// 답글은 원글의 그룹넘 
-				int pid = Integer.parseInt(boardId);	// 부모글의 key
-				group = Integer.parseInt(bGroup);
-				
-				bvo.setPid(pid);
-				bvo.setbGroup(group);
-				
-				insertId = service.boardReInsert(bvo); // 답글 등록
-				if(0<insertId){
-					bvo.setId(insertId);
-					result = service.boardSortNOUpdate(bvo);
-					System.out.println("up:"+result);
-				}
-			}else{
-				insertId = service.boardInsert(bvo);	// 게시글 등록
-				if(0<insertId){
-					// 원글 자신의 키값을 그룹 값에 넣어줌
-					bvo.setId(insertId);
-					bvo.setbGroup(insertId);
-					result = service.boardGroupNOUpdate(bvo);
-					System.out.println("ins:"+result);
-				}
-			}
+			// 파일 경로
+			ServletContext cxt = getServletContext();
+	        String dir = cxt.getRealPath("/upload");
+	        System.out.println(dir);
 			
-			if(result>0){
-				// 등록 성공
-				req.setAttribute("msg", "성공");	
-			}else{
-				// 등록 실패
-				req.setAttribute("msg","실패!");
-			}
-			
-			location = "/BoardServlet?command=bbsList&page="+page;
-			
-			RequestDispatcher rd = req.getRequestDispatcher(location);
-			rd.forward(req, resp);
+	        MultipartRequest multi = new MultipartRequest(req, dir, 5*1024*1024, "UTF-8", new DefaultFileRenamePolicy());
+
+	        Enumeration<?> params = multi.getParameterNames(); 
+	        
+	        while (params.hasMoreElements()) {
+                String name = (String) params.nextElement();
+                String value = multi.getParameter(name);
+                System.out.println("<li>" + name + "=" + value + "</li>");
+	        }
+//	        
+//			// 게시글 등록
+//			int result = 0, group = 0, insertId = 0;
+//			String reqFrm 	= req.getParameter("reqFrm");	// 게시글 or 답변 수정
+//			String boardId 	= req.getParameter("boardId");	// 개시글 key (답글일 경우)
+//			String userId 	= req.getParameter("userId");
+//			String title 	= req.getParameter("title");
+//			String content 	= req.getParameter("content");
+//			String bGroup 	= (req.getParameter("bGroup") == null) ? "" : req.getParameter("bGroup");
+//			
+//			BoardVO bvo = new BoardVO();
+//			bvo.setUserId(userId);
+//			bvo.setTitle(title);
+//			bvo.setContent(content);
+//			
+//			if(boardId != "" && reqFrm.equals("bbsReplyInsert")){ 
+//				// 답글은 원글의 그룹넘 
+//				int pid = Integer.parseInt(boardId);	// 부모글의 key
+//				group = Integer.parseInt(bGroup);
+//				
+//				bvo.setPid(pid);
+//				bvo.setbGroup(group);
+//				
+//				insertId = service.boardReInsert(bvo); // 답글 등록
+//				if(0<insertId){
+//					bvo.setId(insertId);
+//					result = service.boardSortNOUpdate(bvo);
+//					System.out.println("up:"+result);
+//				}
+//			}else{
+//				insertId = service.boardInsert(bvo);	// 게시글 등록
+//				if(0<insertId){
+//					// 원글 자신의 키값을 그룹 값에 넣어줌
+//					bvo.setId(insertId);
+//					bvo.setbGroup(insertId);
+//					result = service.boardGroupNOUpdate(bvo);
+//					System.out.println("ins:"+result);
+//				}
+//			}
+//			
+//			if(result>0){
+//				// 등록 성공
+//				req.setAttribute("msg", "성공");	
+//			}else{
+//				// 등록 실패
+//				req.setAttribute("msg","실패!");
+//			}
+//			
+//			location = "/BoardServlet?command=bbsList&page="+page;
+//			
+//			RequestDispatcher rd = req.getRequestDispatcher(location);
+//			rd.forward(req, resp);
 		}else if(command.equals("bbsUpdate")){	
 			//게시글 수정
 			

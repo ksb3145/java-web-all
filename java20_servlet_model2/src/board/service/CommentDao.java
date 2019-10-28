@@ -18,6 +18,11 @@ public class CommentDao {
 		return instance;
 	}
 	
+	//등록된 코멘트 카운트
+	public int commentCnt(CommentVO cvo){
+		return 0;
+	}
+	
 	//코멘트 등록
 	public int commentInsert(CommentVO cvo){
 		int result = 0;
@@ -258,8 +263,8 @@ public class CommentDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		//String sql = "DELETE FROM mvc_comment WHERE pId = ?";
-		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE cid = ?";
+		//String sql = "DELETE FROM mvc_comment WHERE  delYN = 'N' AND pId = ?";
+		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE  delYN = 'N' AND cid = ?";
 		
 		System.out.println(sql);
 		
@@ -297,8 +302,8 @@ public class CommentDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		//String sql = "DELETE FROM mvc_comment WHERE cmtGroup = ?";
-		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE bid = ?";
+		//String sql = "DELETE FROM mvc_comment WHERE  delYN = 'N' AND cmtGroup = ?";
+		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE delYN = 'N' AND bid = ?";
 		System.out.println(sql);
 		
 		try{

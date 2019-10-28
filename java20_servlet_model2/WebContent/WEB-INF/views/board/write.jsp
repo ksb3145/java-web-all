@@ -7,6 +7,7 @@
 	
 		<div class="col-md-12">
 			<h4>글쓰기</h4>
+			
 			<form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
 				<c:choose>
 					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
@@ -18,6 +19,7 @@
 					</c:when>
 					<c:otherwise>
 						<input type="text" id="command" name="command" value="bbsInsert" />
+						<input type="text" id="page" name="page" value="${page}" />
 						<input type="text" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyInsert' : ''}" />
 						<input type="text" id="userId" name="userId" value="${sessionVO.userId}" />
 						<input type="text" id="boardId" name="boardId" value="${boardId}" />

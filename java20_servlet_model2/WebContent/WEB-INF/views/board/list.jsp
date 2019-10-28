@@ -40,18 +40,14 @@
 					<td>작성자</td>
 					<td>작성일</td>
 				</tr>
-				
-				
-				${(resultData.page *10)+1}
-				<c:forEach var="obj" items="${boardList}">
+				<c:forEach var="obj" items="${boardList}" varStatus="status" >
 					<tr>
-						<td>${resultData.offset + 1}</td>
+						<td>${resultData.rownum-status.index}</td>
 						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}&page=${resultData.page}">${obj.title}</a></td>
 						<td>${obj.userId}</td>
 						<td>${obj.regDate}</td>
 					</tr>
 				</c:forEach>
-				
 			</table>
 		</div>
 		

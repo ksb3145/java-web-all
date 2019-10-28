@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import board.BoardVO;
+import board.FileVO;
 import common.util.DBconn;
 
 // 게시판 쿼리
@@ -120,11 +121,13 @@ public class BoardDao {
 		ResultSet rs = null;
 		
 		String where = "";
-		String searchType 	= (params.get("searchType") == null) 	? "" : (String) params.get("searchType"); 	// 검색타입
-		String keyword		= (params.get("keyword") == null) 		? "" : (String) params.get("keyword"); 		// 검색어
 		
-		if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '"+keyword+"%'";
+		if(null != params){
+			String searchType 	= (null == params.get("searchType")) 	? "" : (String) params.get("searchType"); 	// 검색타입
+			String keyword		= (null == params.get("keyword")) 		? "" : (String) params.get("keyword"); 		// 검색어
 		
+			if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '%"+keyword+"%'";
+		}
 		
 		String sql="SELECT count(*) totalCnt FROM mvc_board WHERE bDelYN = 'N'"+ where;
 		System.out.println(sql);
@@ -185,17 +188,18 @@ public class BoardDao {
 		String searchType 	= (params.get("searchType") == null) 	? "" : (String) params.get("searchType"); 	// 검색타입
 		String keyword		= (params.get("keyword") == null) 		? "" : (String) params.get("keyword"); 		// 검색어
 		
-		if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '"+keyword+"%'";
+		if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '%"+keyword+"%'";
 		
-		sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
+		//sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
+		sql  = "SELECT B.*";
 		sql += " FROM mvc_board B";
 		sql += " WHERE (@rownum:="+offset+")="+offset;
 		sql += " AND B.bDelYN='N' ";
 		sql +=  where;
-		sql += " ORDER BY bGroup DESC, bSort DESC ";
+		sql += " ORDER BY bGroup ASC, bSort DESC, bRegdate DESC "; 
 		sql += " LIMIT "+offset+","+limit;
 		
-		// System.out.println("BoardDao list Sql ::: "+sql);
+		System.out.println("BoardDao list Sql ::: "+sql);
 		
 		try{
 			
@@ -207,7 +211,7 @@ public class BoardDao {
 			while(rs.next()){
 				BoardVO bvo = new BoardVO();
 				
-				bvo.setRownum(rs.getInt("ROWNUM"));
+				//bvo.setRownum(rs.getInt("ROWNUM"));
 				bvo.setId(rs.getInt("bId"));
 				bvo.setTitle(rs.getString("bTitle"));
 				bvo.setContent(rs.getString("bContent"));
@@ -322,6 +326,7 @@ public class BoardDao {
 		return result;
 	}
 	
+	// 순서 증가
 	public int sortNOUpdate(BoardVO bvo){
 		int result = 0;
 		PreparedStatement pstmt = null;
@@ -415,13 +420,58 @@ public class BoardDao {
 		return bvo;
 	}
 	
-	// 게시글 삭제
-	public int boardDel(int bid){
+	//  게시글 그룹 key ( result 값 null => 답글없음..)
+		public BoardVO selectBoardGroupKey(BoardVO bvo){
+			ResultSet rs = null;
+			PreparedStatement pstmt = null;
+			BoardVO rbvo = null;	//리턴할 객체참조변수
+			
+			String sql = "SELECT bGroup FROM mvc_board WHERE bGroup = ?";
+			System.out.println(sql);
+			try{
+				DBconn.dbConn = DBconn.getConnection();
+				pstmt = DBconn.dbConn.prepareStatement( sql );
+				pstmt.setInt(1,bvo.getId());
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()){
+					rbvo = new BoardVO();
+					rbvo.setbGroup(rs.getInt("bGroup"));
+				}
+				
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}finally {
+				try {
+					if( null != pstmt ) pstmt.close();
+				} catch ( SQLException e ) {
+					e.printStackTrace();
+				}
+				
+				try {
+					if( null != rs ) rs.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
+				try {
+					if(null != DBconn.dbConn) DBconn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			return rbvo;
+		}
+	
+	// 게시글 삭제 (키값)
+	public int boardDel(BoardVO bvo){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		//String sql = "DELETE FROM mvc_board WHERE bid = ?";
-		String sql = "UPDATE mvc_board SET bDelYN = 'Y' WHERE bGroup = ?";
+		//String sql = "DELETE FROM mvc_board WHERE bDelYN = 'N' AND bid = ?";
+		String sql = "UPDATE mvc_board SET bDelYN = 'Y' WHERE bDelYN = 'N' AND bid = ?";
 		
 		System.out.println(sql);
 		
@@ -429,7 +479,7 @@ public class BoardDao {
 			DBconn.dbConn = DBconn.getConnection();
 			
 			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, bid);
+			pstmt.setInt(1, bvo.getId());
 			
 			result = pstmt.executeUpdate();
 			
@@ -451,6 +501,82 @@ public class BoardDao {
 			}
 		}
 		
+		return result;
+	}
+	
+	// 게시글 그룹삭제
+	public int boardGroupDel(BoardVO bvo){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		//String sql = "DELETE FROM mvc_board WHERE bDelYN = 'N' AND bid = ?";
+		String sql = "UPDATE mvc_board SET bDelYN = 'Y' WHERE bDelYN = 'N' AND bGroup = ?";
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, bvo.getbGroup());
+			
+			result = pstmt.executeUpdate();
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
+	//파일등록
+	public int FileUpload(FileVO fvo){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql = "INSERT INTO mvc_file ( bId, file_name, file_org_name, file_path, regdate ) VALUES ( ?, ?, ?, ?, now() );";
+		
+		try{
+			
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, fvo.getBid());
+			pstmt.setString(2, fvo.getFileName());
+			pstmt.setString(3, fvo.getFileOrgName());
+			pstmt.setString(4, fvo.getFilePath());
+			
+			result = pstmt.executeUpdate();
+			
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			
+			try{
+				if( null != pstmt) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try{
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return result;
 	}
 }

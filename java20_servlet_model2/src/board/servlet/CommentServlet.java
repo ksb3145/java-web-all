@@ -184,13 +184,12 @@ public class CommentServlet extends HttpServlet {
 			}
 			
 			if(!resultData.isEmpty()){
-				CommentServlet ss = new CommentServlet();
+				// 데이터 값이 있다면,, 재귀호출..
+				CommentServlet ss = new CommentServlet();	
 				ss.commentList(resultData);
-			}
-			
+			}	
 			result = resultData;
 		}
-		
 		return result;
 	}
 	

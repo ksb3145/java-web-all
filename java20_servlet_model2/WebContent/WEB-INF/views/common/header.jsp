@@ -11,13 +11,21 @@
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- 스크립트 선언 -->
 <script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/common.js"></script>
 <script src="js/bootstrap.min.js"></script>
 
 <title>게시판</title>
 </head>
 <body>
-<div class="container">
 
+<div id="loading">
+	<div class="loadingInner">
+		<img src="/img/loading.gif">
+		<p>잠시만 기다려주세요...</p>
+	</div>
+</div>
+
+<div class="container">
 	<div class="row header">
 			<div class="col-md-2">
 				<a href="/loginServlet?command=home" ><h3 class="logo">BBS</h3></a>

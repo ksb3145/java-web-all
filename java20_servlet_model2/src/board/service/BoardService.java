@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import board.BoardVO;
+import board.FileVO;
 import member.service.MemberDao;
 import member.vo.MemberVO;
 
@@ -60,10 +61,25 @@ public class BoardService {
 	public int boardDel(BoardVO bvo){
 		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
 		if (null != mvo){
-			return boardDao.boardDel(bvo.getId());
+			return boardDao.boardDel(bvo);
 		}else{
 			return 0;
 		}
+	}
+	
+	// 게시글 그룹 삭제
+		public int boardGroupDel(BoardVO bvo){
+			MemberVO mvo = memberDao.selectOne(bvo.getUserId());
+			if (null != mvo){
+				return boardDao.boardGroupDel(bvo);
+			}else{
+				return 0;
+			}
+		}
+	
+	// key값 조회
+	public BoardVO selectBoardGroupKey(BoardVO bvo){
+		return boardDao.selectBoardGroupKey(bvo);
 	}
 	
 	// 조회한 데이터 row count
@@ -79,5 +95,11 @@ public class BoardService {
 	// 게시판 상세페이지
 	public BoardVO boardView(int boardId){
 		return boardDao.selectView(boardId);
+	}
+	
+	
+	// 게시글 첨부파일 등록
+	public int FileUpload(FileVO fvo){
+		return boardDao.FileUpload(fvo);
 	}
 }

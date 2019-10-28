@@ -4,29 +4,7 @@
 
 
 <style>
-/*공통*/
-	body { font-size: 15px; }
-	ul { list-style: none; padding: 0; }
-	button:not(:disabled), 
-	[type='button']:not(:disabled), 
-	[type='reset']:not(:disabled), 
-	[type='submit']:not(:disabled),
-	span.btn { cursor: pointer; }
-	/* 마진,패딩 값 초기화 */
-	.mgReset { margin: 0px !important; }
-	.pdReset { padding: 0px !important; }
-	
-	/*버튼*/
-	.sm { font-size: 10px; padding: 3px 5px; }
-	.md { font-size: 13px; padding: 5px 10px; }
-	.lg { font-size: 15px; padding: 5px 10px; }
-	.btn { vertical-align: middle; border-radius: 5px;   font-weight: bold; }
-	.black { background: #333; color: #fff; }
-	.gray { background: gray; color: #fff; }
-	.red { background: red; color: #fff; }
-	.green { background: green; color: #fff; }
-	.btn:hover { background: yellow; color: #333; border:1px solid #eee; }
-	
+
 	/*코멘트*/
 	.commentArea li:first-child { border-top: none;  }
 	.commentArea li { border-top: 1px solid rgba(0, 0, 0, 0.125);  }
@@ -256,7 +234,7 @@
 	
     function callAjax(data, url){
     	console.log(data, url);
-    	console.log(url);
+    	
     	$.ajax({
 			url:url,
 		    async:true,
@@ -267,6 +245,9 @@
 		    // 서버 요청 전 호출 되는 함수 return false; 일 경우 요청 중단
 		    },
 		    success:function(resultData) {
+		    	
+		    	console.log(resultData.code);
+		    	
 		    // 요청 완료 시
 		    	if(resultData.code == "OK"){
 		    		alert("성공.");

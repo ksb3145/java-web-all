@@ -10,7 +10,6 @@ public class DBconn {
 	// connection
 	public static Connection getConnection() throws ClassNotFoundException, SQLException{
 		if(dbConn == null){
-			// db 정보
 			String driverName = "com.mysql.jdbc.Driver";
 			
 //			String url = "jdbc:mysql://ncom.iptime.org/test_bom?useUnicode=true&characterEncoding=utf8";
@@ -22,11 +21,11 @@ public class DBconn {
 			String pw = "0000";
 			
 			Class.forName(driverName);
-			System.out.println("드라이버 로드 ...");
+			System.out.println("Driver 로드..");
 			
 			dbConn = DriverManager.getConnection(url, id, pw);
 			
-			System.out.println("DB 연결 성공 ...");
+			System.out.println("DB Connection...");
 		}
 		
 		return dbConn;
@@ -36,7 +35,7 @@ public class DBconn {
 	public static void close() throws SQLException{
 		
 		if(dbConn!=null){
-			System.out.println("conn닫기 ...");
+			System.out.println("conn close...");
 			if(!dbConn.isClosed()){
 				dbConn.close();
 			}

@@ -8,7 +8,7 @@
 		<div class="col-md-12">
 			<h4>글쓰기</h4>
 			
-			<form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
+			<form name="frm" id="frm" class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
 			${reqFrm}
 				<c:choose>
 					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
@@ -53,10 +53,12 @@
 									</li>
 								</ul>
 							</c:forEach>
+							<input type="hidden" id="fileUploadYN" name="fileUploadYN" value="N" />
 						</c:when>
 						<c:otherwise>
 							<label for="file-upload">파일업로드</label>
-							<input type="file" class="form-control" id="file-upload" name="file-upload" />
+							<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
+							<input type="hidden" id="fileUploadYN" name="fileUploadYN" value="Y" />
 						</c:otherwise>
 					</c:choose>
 					
@@ -75,7 +77,7 @@
 									<button type="submit" class="btn btn-warning">수정</button>
 								</c:when>
 								<c:otherwise>
-									<button type="submit" class="btn btn-success">등록</button>
+									<button type="button" onClick="frmSend();" class="btn btn-success">등록</button>
 								</c:otherwise>
 							</c:choose>
 						</li>

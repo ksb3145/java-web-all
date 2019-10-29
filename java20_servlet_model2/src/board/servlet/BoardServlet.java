@@ -1,5 +1,6 @@
 package board.servlet;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 //import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -70,19 +72,17 @@ public class BoardServlet extends HttpServlet {
 		System.out.println("page ::: "+page);
 		
 		if(command == " "){
-			
 
-			
-			ServletContext cxt = getServletContext();
-			fileDir = cxt.getRealPath("/upload/bbs");	// 파일 저장 경로
-			//System.out.println(fileDir);
+			//ServletContext cxt = getServletContext();
+			//fileDir = cxt.getRealPath("/upload/bbs");	// 파일 저장 경로
+			fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
+			System.out.println(fileDir);
 			
 			BoardServlet bs = new BoardServlet();
 			bs.boardMultipart(req,resp);
 			
 		}
 		else if(command.equals("bbsList")){	// 게시판 리스트
-			
 			
 			HashMap<Object, Object> resultData = new HashMap<Object, Object>();
 			HashMap<Object, Object> params = new HashMap<Object, Object>();
@@ -374,6 +374,20 @@ public class BoardServlet extends HttpServlet {
 		    
 		    PrintWriter out = resp.getWriter();
 		    out.print(json);
+		}else if(command.equals("FileDownLoad")){
+//			File file = new File("C:\\temp\\downloadfilename.csv");
+//			FileInputStream fileIn = new FileInputStream(file);
+//			ServletOutputStream out = resp.getOutputStream();
+//			 
+//			byte[] outputByte = new byte[4096];
+//			//copy binary contect to output stream
+//			while(fileIn.read(outputByte, 0, 4096) != -1)
+//			{
+//				out.write(outputByte, 0, 4096);
+//			}
+//			fileIn.close();
+//			out.flush();
+//			out.close();
 		}
 	}
 	
@@ -411,7 +425,7 @@ public class BoardServlet extends HttpServlet {
 		// 설정
 		String location = "", pno = "" , command = "";
 		// 게시판 입력값
-		String reqFrm = "",  boardId = "", bGroup = "", userId = "", title = "", content = "";
+		String reqFrm = "",  boardId = "", bGroup = "", userId = "", title = "", content = "", fileUploadYN = "";
 		// 파일
 		String fileName = "" , realFileName = "";
 		
@@ -429,6 +443,7 @@ public class BoardServlet extends HttpServlet {
 			title 			= StringUtil.strNullCheck(multi.getParameter("title"));
 			content 		= StringUtil.strNullCheck(multi.getParameter("content"));
 			bGroup 		= StringUtil.strNullCheck(multi.getParameter("bGroup"));
+			fileUploadYN 		= StringUtil.strNullCheck(multi.getParameter("fileUploadYN"));
 			
 	        BoardVO bvo = new BoardVO();
 	        
@@ -481,8 +496,8 @@ public class BoardServlet extends HttpServlet {
 				}
 			}
 			
-			// 등록/수정 성공
-			if(result>0){
+			// 등록/수정 성공! 파일첨부!
+			if(result>0 && fileUploadYN == "Y"){
 				
 				// 파일설정
 				String uploadDate = new SimpleDateFormat("yyMMddHmsS").format(new Date());	//현재시간
@@ -497,6 +512,8 @@ public class BoardServlet extends HttpServlet {
 				        int i = -1;
 				        i = fileName.lastIndexOf(".");	// 파일 확장자 위치
 				        realFileName = uploadDate+fileName.substring(i,fileName.length());	// 현재시간과 확장자 합치기..
+				        
+				        System.out.println("fileDir ::: " + fileDir);
 				        
 				        java.io.File oldFile = new  java.io.File(fileDir+"/"+fileName);
 				        java.io.File newFile = new java.io.File(fileDir+"/"+realFileName);

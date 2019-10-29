@@ -33,7 +33,7 @@ import common.util.StringUtil;
 public class BoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static String fileDir = "";
-       
+	   
     private BoardService service;
 	public BoardServlet() {
     	service = new BoardService();
@@ -70,9 +70,11 @@ public class BoardServlet extends HttpServlet {
 		System.out.println("page ::: "+page);
 		
 		if(command == " "){
-			ServletContext cxt = getServletContext();
-			fileDir = cxt.getRealPath("/upload");
 			
+
+			
+			ServletContext cxt = getServletContext();
+			fileDir = cxt.getRealPath("/upload/bbs");	// 파일 저장 경로
 			//System.out.println(fileDir);
 			
 			BoardServlet bs = new BoardServlet();
@@ -195,6 +197,7 @@ public class BoardServlet extends HttpServlet {
 				req.setAttribute("pid", bvo.getPid());
 				
 				req.setAttribute("boardDetail", bvo );
+				req.setAttribute("boardFiles", service.selectFiles(boardId) );
 			}
 			
 			
@@ -255,36 +258,36 @@ public class BoardServlet extends HttpServlet {
 //			
 //			RequestDispatcher rd = req.getRequestDispatcher(location);
 //			rd.forward(req, resp);
-		}else if(command.equals("bbsUpdate")){	
-			//게시글 수정
-			
-			String no = req.getParameter("boardId");
-			String userId = req.getParameter("userId");
-			String title = req.getParameter("title");
-			String content = req.getParameter("content");
-			
-			int boardId = Integer.parseInt(no);	// 게시판id
-			page = Integer.parseInt(req.getParameter("page"));	// 페이지
-			
-			BoardVO bvo = new BoardVO();
-			bvo.setId(boardId);
-			bvo.setUserId(userId);
-			bvo.setTitle(title);
-			bvo.setContent(content);
-			
-			int result = service.boardUpdate(bvo);
-			
-			if(result>0){
-				// 등록 성공
-				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
-			}else{
-				// 등록 실패
-				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
-			}
-			
-			RequestDispatcher rd = req.getRequestDispatcher(location);
-			rd.forward(req, resp);
-			
+//		}else if(command.equals("bbsUpdate")){	
+//			//게시글 수정
+//			
+//			String no = req.getParameter("boardId");
+//			String userId = req.getParameter("userId");
+//			String title = req.getParameter("title");
+//			String content = req.getParameter("content");
+//			
+//			int boardId = Integer.parseInt(no);	// 게시판id
+//			page = Integer.parseInt(req.getParameter("page"));	// 페이지
+//			
+//			BoardVO bvo = new BoardVO();
+//			bvo.setId(boardId);
+//			bvo.setUserId(userId);
+//			bvo.setTitle(title);
+//			bvo.setContent(content);
+//			
+//			int result = service.boardUpdate(bvo);
+//			
+//			if(result>0){
+//				// 등록 성공
+//				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
+//			}else{
+//				// 등록 실패
+//				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
+//			}
+//			
+//			RequestDispatcher rd = req.getRequestDispatcher(location);
+//			rd.forward(req, resp);
+//			
 		}else if(command.equals("bbsDelete")){	
 			// 게시글 삭제
 			String userId = req.getParameter("userId");
@@ -329,6 +332,8 @@ public class BoardServlet extends HttpServlet {
 			// 게시판 댓글
 			CommentService cmtService = new CommentService();
 			req.setAttribute("commentList", cmtService.selectCommentList(boardId) );
+			
+			req.setAttribute("boardFiles", service.selectFiles(boardId) );
 			req.setAttribute("page", page);
 			//req.setAttribute("code", "OK");
 			//req.setAttribute("msg", "게시판 조회 성공");
@@ -336,6 +341,39 @@ public class BoardServlet extends HttpServlet {
 			location= "/WEB-INF/views/board/view.jsp";
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
+		}else if(command.equals("FileDel")){
+			int fId = 0;
+			String resultCode = "";
+			String fileId = StringUtil.strNullCheck(req.getParameter("fileId"));
+			
+			if(!" ".equals(fileId)) fId = Integer.parseInt(fileId);
+			
+			if(fId>0){
+				FileVO fvo = new FileVO();
+				fvo.setfId(fId);
+				
+				BoardServlet bs = new BoardServlet();
+				int result = bs.fileDel(fvo);
+				
+				if(result>0){
+					resultCode = "OK";
+				}else{
+					resultCode = "E11"; // 결과 값 없음.
+				}
+				
+			}else{
+				resultCode = "E00";	// fid값 없음.
+			}
+			
+			JSONObject json = new JSONObject(); 
+			json.put("code", resultCode);
+			
+		    // 헤더설정
+		    resp.setContentType("application/json");
+		    resp.setCharacterEncoding("UTF-8");
+		    
+		    PrintWriter out = resp.getWriter();
+		    out.print(json);
 		}
 	}
 	
@@ -368,7 +406,7 @@ public class BoardServlet extends HttpServlet {
 		return resultVal;
 	}
 	
-	// 파일첨부..
+	// 파일첨부..( 글쓰기/수정)
 	public void boardMultipart(HttpServletRequest req, HttpServletResponse resp){
 		// 설정
 		String location = "", pno = "" , command = "";
@@ -379,95 +417,119 @@ public class BoardServlet extends HttpServlet {
 		
 		try {
 	        // 파일 업로드...
-	        MultipartRequest multi = new MultipartRequest(req, fileDir, 5*1024*1024, "EUC-KR", new DefaultFileRenamePolicy());
-	        
-	        // 한글깨짐 처리
-	        req.setCharacterEncoding("UTF-8");
-			resp.setContentType("text/html;charset-UTF-8");
-			
+	        MultipartRequest multi = new MultipartRequest(req, fileDir, 5*1024*1024, "UTF-8", new DefaultFileRenamePolicy());
+
 	        // 입력값
-	        int result = 0, group = 0, insertId = 0;
-	        pno = multi.getParameter("page");
-	        command = multi.getParameter("command");
-	        reqFrm 	= multi.getParameter("reqFrm");			// 게시글 or 답변 수정
-			boardId 	= multi.getParameter("boardId");			// 개시글 key (답글일 경우)
-			userId 	= multi.getParameter("userId");
-			title 		= multi.getParameter("title");
-			content 	= multi.getParameter("content");
-			bGroup 	= (multi.getParameter("bGroup") == null) ? "" : multi.getParameter("bGroup");
+	        int result = 0, group = 0, insertId = 0, pid =0;
+	        pno 			= StringUtil.strNullCheck(multi.getParameter("page"));
+	        command		= StringUtil.strNullCheck(multi.getParameter("command"));
+	        reqFrm 		= StringUtil.strNullCheck(multi.getParameter("reqFrm"));			// 게시글 or 답변 수정
+			boardId 		= StringUtil.strNullCheck(multi.getParameter("boardId"));			// 개시글 key (답글일 경우)
+			userId 		= StringUtil.strNullCheck(multi.getParameter("userId"));
+			title 			= StringUtil.strNullCheck(multi.getParameter("title"));
+			content 		= StringUtil.strNullCheck(multi.getParameter("content"));
+			bGroup 		= StringUtil.strNullCheck(multi.getParameter("bGroup"));
 			
 	        BoardVO bvo = new BoardVO();
-			bvo.setUserId(userId);
-			bvo.setTitle(title);
-			bvo.setContent(content);
-			
-			if(boardId != "" && reqFrm.equals("bbsReplyInsert")){ 
-				// 답글은 원글의 그룹넘 
-				int pid = Integer.parseInt(boardId);	// 부모글의 key
-				group = Integer.parseInt(bGroup);
-				
-				bvo.setPid(pid);
-				bvo.setbGroup(group);
-				
-				insertId = service.boardReInsert(bvo); // 답글 등록
-				if(0<insertId){
-					bvo.setId(insertId);
-					result = service.boardSortNOUpdate(bvo);
-					System.out.println("up:"+result);
+	        
+	        // 게시글 공통
+			bvo.setUserId(userId);		// 작성자 아이디
+			bvo.setTitle(title);				// 제목
+			bvo.setContent(content);	// 내용
+
+			if(!" ".equals(boardId)) pid = Integer.parseInt(boardId);	// 부모글의 key
+
+			if(command.equals("bbsInsert")){
+				// 게시글 등록 / 답글 등록
+				if( reqFrm.equals("bbsReplyInsert")){ 
+					group = Integer.parseInt(bGroup);
+					
+					bvo.setPid(pid);			//게시글 부모키
+					bvo.setbGroup(group);	// 게시글 그룹 값
+					
+					insertId = service.boardReInsert(bvo); // 답글 등록
+					if(0<insertId){
+						bvo.setId(insertId);
+						//result = service.boardSortNOUpdate(bvo);	// 게시글 그룹값 update
+					}
+				}else{
+					insertId = service.boardInsert(bvo);	// 게시글 등록
+					if(0<insertId){
+						// 원글 자신의 키값을 그룹 값에 넣어줌
+						bvo.setId(insertId);			// 등록된 게시글의 key값
+						bvo.setbGroup(insertId);	// 게시글 그룹 값
+						//result = service.boardGroupNOUpdate(bvo);	// 게시글 그룹값 update
+					}
 				}
-			}else{
-				insertId = service.boardInsert(bvo);	// 게시글 등록
-				if(0<insertId){
-					// 원글 자신의 키값을 그룹 값에 넣어줌
-					bvo.setId(insertId);
-					bvo.setbGroup(insertId);
-					result = service.boardGroupNOUpdate(bvo);
-					System.out.println("ins:"+result);
+				result = service.boardSortNOUpdate(bvo);	// 게시글 그룹값 update
+				
+				location = "/BoardServlet?command=bbsList&page="+pno;
+				
+			} else if(command.equals("bbsUpdate")){
+				// 게시글/답글 수정
+				
+				bvo.setId(pid);	// 게시글 번호
+				
+				result = service.boardUpdate(bvo); // 게시글 수정
+
+				if(result>0){
+					// 등록 성공
+					location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+pno;
+				}else{
+					// 등록 실패
+					location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+pno;
 				}
 			}
 			
+			// 등록/수정 성공
 			if(result>0){
-				// 등록 성공
 				
+				// 파일설정
 				String uploadDate = new SimpleDateFormat("yyMMddHmsS").format(new Date());	//현재시간
-
-				// S: 파일관련
 				Enumeration files = multi.getFileNames();	//Enumeration 
-				String str = (String) files.nextElement();			// 파일
-				fileName = multi.getFilesystemName(str);		// 파일명
+				String str = (String) files.nextElement();	// 파일
+				fileName = multi.getFilesystemName(str);	// 파일명
+				String bbsPath = "/upload/bbs";
 				
-		        int i = -1;
-		        i = fileName.lastIndexOf(".");	// 파일 확장자 위치
-		        realFileName = uploadDate+fileName.substring(i,fileName.length());	// 현재시간과 확장자 합치기..
-		        
-		        java.io.File oldFile = new  java.io.File(fileDir+"/"+fileName);
-		        java.io.File newFile = new java.io.File(fileDir+"/"+realFileName);
-		        // 파일명 날짜로 변경..
-		        oldFile.renameTo(newFile);
-				// E: 파일관련
-		        
-		        //파일첨부 게시판 등록..
-		        FileVO fvo = new FileVO();
-		        fvo.setBid(bvo.getId());
-		        fvo.setFileName(realFileName);
-		        fvo.setFileOrgName(fileName);
-		        fvo.setFilePath(fileDir);
-		        //fvo.setFileSize(fileSize);
-		        
-		        int fileResult = service.FileUpload(fvo);
-		        
-		        if(fileResult>0){
-		        	req.setAttribute("msg", "성공");
-		        }else{
-		        	req.setAttribute("msg", "실패");
-		        }
+				// 게시글 등록/수정 후, 파일 등록있으면 등록
+				if(null != fileName){
+						// S: 파일등록
+				        int i = -1;
+				        i = fileName.lastIndexOf(".");	// 파일 확장자 위치
+				        realFileName = uploadDate+fileName.substring(i,fileName.length());	// 현재시간과 확장자 합치기..
+				        
+				        java.io.File oldFile = new  java.io.File(fileDir+"/"+fileName);
+				        java.io.File newFile = new java.io.File(fileDir+"/"+realFileName);
+				        oldFile.renameTo(newFile);		// 파일명 날짜로 변경..
+						
+				        // 파일첨부 게시판 등록.. 
+				        // 추가 할 기능: 확장자,파일사이즈 (확장자/용량 제한)
+				        FileVO fvo = new FileVO();
+				        fvo.setBid(bvo.getId());
+				        fvo.setFileName(realFileName);
+				        fvo.setFileOrgName(fileName);
+				        fvo.setFilePath(bbsPath);				        
+				        //fvo.setFileSize(fileSize);
+				        
+				        int fileResult = service.FileUpload(fvo);
+				        
+				        if(fileResult>0){
+				        	req.setAttribute("msg", "성공");
+				        }else{
+				        	req.setAttribute("msg", "실패");
+				        }
+				        // E: 파일등록
+				   
+				}else{
+					req.setAttribute("msg", "성공");
+				}
 		        
 			}else{
 				// 등록 실패
 				req.setAttribute("msg", "실패");	
 			}
 			
-			location = "/BoardServlet?command=bbsList&page="+pno;
+			
 			
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
@@ -479,6 +541,11 @@ public class BoardServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	// 파일삭제
+	public int fileDel(FileVO fvo){
+		return service.FileDel(fvo);
 	}
 	
 	public String getUrl(HttpServletRequest req){

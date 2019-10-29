@@ -32,25 +32,31 @@
 						<col width="10%" />
 						<col width="" />
 						<col width="10%" />
-						<col width="15%" />
-						<col width="10%" />
-						<col width="15%" />
+						<col width="" />
 					</colgroup>
 					<tbody>
 						<tr>
 							<th>제목</th>
-							<td colspan="5">${boardDetail.title}</td>
+							<td colspan="3">${boardDetail.title}</td>
 						</tr>
 						<tr>
 							<th>작성자</th>
 							<td>${boardDetail.userId}</td>
 							<th>작성일</th>
 							<td>${boardDetail.regDate}</td>
-							<th>첨부파일</th>
-							<td> - </td>
 						</tr>
 						<tr>
-							<td colspan="6">${boardDetail.content}</td>
+							<th>첨부파일</th>
+							<td colspan="3">
+								<ul>
+									<c:forEach var="obj" items="${boardFiles}" varStatus="status" >
+									<li>${obj.fileOrgName} </li>
+									</c:forEach>
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="4">${boardDetail.content}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -143,7 +149,8 @@
 	</div>
 
 
-<script>
+<script type="text/javascript">
+<!--
 	$(document).ready(function() {
 		// 원글->코멘트
 		$(document).on("click",".commentSubmit",function(e){
@@ -233,7 +240,7 @@
 
 	
     function callAjax(data, url){
-    	console.log(data, url);
+    	//console.log(data, url);
     	
     	$.ajax({
 			url:url,
@@ -242,13 +249,12 @@
 		    data: data,
 		    dataType:'json',
 		    beforeSend:function(jqXHR) {
-		    // 서버 요청 전 호출 되는 함수 return false; 일 경우 요청 중단
+		    	$("#loading").css("display","block");
 		    },
 		    success:function(resultData) {
+		    	//console.log(resultData.code);
+		    	$("#loading").css("display","none");
 		    	
-		    	console.log(resultData.code);
-		    	
-		    // 요청 완료 시
 		    	if(resultData.code == "OK"){
 		    		alert("성공.");
 		    	}else{
@@ -268,6 +274,7 @@
 			}
         });	
     }
+-->
 </script>
 	
 <jsp:include page="../common/footer.jsp" flush="false"></jsp:include>

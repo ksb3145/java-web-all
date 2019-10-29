@@ -70,7 +70,7 @@ public class BoardDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		String sql   = "INSERT INTO mvc_board (pId, bGroup, bSort, mUserId, bTitle, bContent, bRegdate) VALUES (?, ?, ?, ?, ?, ?, now());";
+		String sql   = "INSERT INTO mvc_board( pId, bGroup, bSort, mUserId, bTitle, bContent, bRegdate) VALUES (?, ?, ?, ?, ?, ?, now());";
 		
 		try{
 			
@@ -188,16 +188,17 @@ public class BoardDao {
 		String searchType 	= (params.get("searchType") == null) 	? "" : (String) params.get("searchType"); 	// 검색타입
 		String keyword		= (params.get("keyword") == null) 		? "" : (String) params.get("keyword"); 		// 검색어
 		
-		if(searchType != "" && keyword != "") where += " AND "+searchType+" LIKE '%"+keyword+"%'";
+		if(searchType != "" && keyword != ""){
+			where += " AND "+searchType;
+			where += " LIKE '%"+keyword+"%'";
+		}
 		
-		//sql  = "SELECT @rownum:=@rownum+1 ROWNUM, B.*";
-		sql  = "SELECT B.*";
-		sql += " FROM mvc_board B";
-		sql += " WHERE (@rownum:="+offset+")="+offset;
-		sql += " AND B.bDelYN='N' ";
-		sql +=  where;
-		sql += " ORDER BY bGroup ASC, bSort DESC, bRegdate DESC "; 
-		sql += " LIMIT "+offset+","+limit;
+		sql  = "	   SELECT B.* ";
+		sql += "		FROM mvc_board B ";
+		sql += " 	  WHERE B.bDelYN='N' "+ where;
+		sql += " ORDER BY bGroup ASC";
+		sql += "			   , bRegdate DESC "; 
+		sql += " 		 LIMIT "+offset+","+limit;
 		
 		System.out.println("BoardDao list Sql ::: "+sql);
 		
@@ -252,7 +253,13 @@ public class BoardDao {
 	public int updateBoard(BoardVO bvo){
 		int result = 0;
 		
-		String sql = "UPDATE mvc_board SET bTitle = ?, bContent = ? WHERE bId = ? AND mUserId = ?";
+		String sql = "UPDATE mvc_board ";
+				sql +="	  SET bTitle = ? ";
+				sql +="		 , bContent = ? ";
+				sql +="WHERE bId = ? ";
+				sql += "	AND mUserId = ? ";
+				
+				System.out.println(sql);
 
 		PreparedStatement pstmt = null;
 		try{	
@@ -331,10 +338,10 @@ public class BoardDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		String sql  = "UPDATE mvc_board";
-			   sql +=   " SET bSort = (bSort+1)";
-			   sql += " WHERE bid != ? ";
-			   sql += " AND bGroup = ?";
+		String sql   = "UPDATE mvc_board";
+				sql += " 	   SET bSort = (bSort+1)";
+				sql += " WHERE bid != ? ";
+				sql += "	  AND bGroup = ?";
 		
 		try{	
 			DBconn.dbConn = DBconn.getConnection();
@@ -368,8 +375,18 @@ public class BoardDao {
 	// 게시글 상세
 	public BoardVO selectView(int bId){
 	
-		String sql = "SELECT bId, pId, bGroup, bTitle, bContent, bHit, bRegdate, mUserId FROM mvc_board WHERE bid=?;";
-	
+		String sql   = "SELECT bId, pId, bGroup, bTitle, bContent, bHit, bRegdate, mUserId ";
+				sql += " FROM mvc_board ";
+				sql += "WHERE bid=? ";
+		
+		/**
+		String sql   = "SELECT B.bId, B.pId, B.bGroup, B.bTitle, B.bContent, B.bHit, B.bRegdate, B.mUserId, ";
+				sql += "			F.fId, F.file_name, F.file_org_name, F.file_path ";
+				sql += " FROM mvc_board B, mvc_file F ";
+				sql += "WHERE B.bId = F.bId ";
+				sql += "AND B.bid = ?";
+		**/
+				
 	 	PreparedStatement pstmt = null;
 	 	BoardVO bvo = null;	//리턴할 객체참조변수
 		ResultSet rs = null; //결과셋 참조변수들 준비
@@ -427,7 +444,7 @@ public class BoardDao {
 			BoardVO rbvo = null;	//리턴할 객체참조변수
 			
 			String sql = "SELECT bGroup FROM mvc_board WHERE bGroup = ?";
-			System.out.println(sql);
+			
 			try{
 				DBconn.dbConn = DBconn.getConnection();
 				pstmt = DBconn.dbConn.prepareStatement( sql );
@@ -470,10 +487,12 @@ public class BoardDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		//String sql = "DELETE FROM mvc_board WHERE bDelYN = 'N' AND bid = ?";
-		String sql = "UPDATE mvc_board SET bDelYN = 'Y' WHERE bDelYN = 'N' AND bid = ?";
+		String sql   = "UPDATE mvc_board";
+				sql += "		SET bDelYN = 'Y' ";
+				sql += " WHERE bDelYN = 'N'";
+				sql += "	  AND bid = ?";
 		
-		System.out.println(sql);
+		//System.out.println(sql);
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();
@@ -510,7 +529,9 @@ public class BoardDao {
 		PreparedStatement pstmt = null;
 		
 		//String sql = "DELETE FROM mvc_board WHERE bDelYN = 'N' AND bid = ?";
-		String sql = "UPDATE mvc_board SET bDelYN = 'Y' WHERE bDelYN = 'N' AND bGroup = ?";
+		String sql   = "UPDATE mvc_board";
+				sql += "   SET bDelYN = 'Y' ";
+				sql += " WHERE bGroup = ? ";
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();
@@ -574,6 +595,103 @@ public class BoardDao {
 			try{
 				if(null != DBconn.dbConn) DBconn.close();
 			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
+	// 게시들에 등록된 파일
+	public List<FileVO> selectFiles(int boardId){
+		
+		PreparedStatement pstmt = null;
+		List<FileVO> files = new ArrayList<FileVO>();
+		ResultSet rs = null;
+		
+		String sql   = "SELECT fId, file_name, file_org_name, file_path "; 
+				sql += " FROM mvc_file ";
+				sql += "WHERE bid = ? ";
+				sql += "  AND delYN = 'N' ";
+				
+				
+				System.out.println(sql);
+		
+		try{
+			
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, boardId);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()){
+				FileVO fvo = new FileVO();
+				fvo.setfId(rs.getInt("fId"));
+				fvo.setFileName(rs.getString("file_name"));
+				fvo.setFileOrgName(rs.getString("file_org_name"));
+				fvo.setFilePath("file_path");
+				files.add(fvo);
+			}
+			
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			
+			try{
+				if( null != pstmt ) pstmt.close();
+			}catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try{
+				if( null != rs ) rs.close();
+			}catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
+			try{
+				if(null != DBconn.dbConn) DBconn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return files;
+	}
+	
+	
+	// 파일삭제
+	public int FileDel(FileVO fvo){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		
+		String sql   = "UPDATE mvc_file ";
+				sql += "   SET delYN = 'Y' ";
+				sql += " WHERE fId = ? ";
+		
+		try{
+			DBconn.dbConn = DBconn.getConnection();
+			
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			pstmt.setInt(1, fvo.getfId());
+			
+			result = pstmt.executeUpdate();
+			
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if( null != pstmt ) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}

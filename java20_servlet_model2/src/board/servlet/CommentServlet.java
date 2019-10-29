@@ -46,7 +46,7 @@ public class CommentServlet extends HttpServlet {
 		String command = req.getParameter("command");
 		
 		if(command.equals("commentInsert")){
-			// 코멘트 등록 (ajax/json)
+			// 댓글 등록 (ajax/json)
 			
 			String resultCode 	= "OK"; // 결과코드
 			String boardId		= req.getParameter("boardId");	// 게시글
@@ -64,7 +64,7 @@ public class CommentServlet extends HttpServlet {
 			int depth			= Integer.parseInt(cmtDepth);
 			int sort 			= Integer.parseInt(cmtSort);
 			
-			// 바인딩시킬 코멘트 객체 생성..
+			// 바인딩시킬 댓글 객체 생성..
 			CommentVO cvo = new CommentVO();
 			cvo.setbId(bId);
 			cvo.setUserId(userId);
@@ -100,7 +100,7 @@ public class CommentServlet extends HttpServlet {
 		    out.print(json);
 		    
 		}else if(command.equals("cmtDelete")){
-			//  코멘트삭제
+			//  댓글삭
 			
 			String resultCode 	= "";
 			//String boardId		= req.getParameter("boardId");	// 게시글 key
@@ -116,45 +116,24 @@ public class CommentServlet extends HttpServlet {
 			CommentServlet cs = new CommentServlet();
 			List<Integer> id = new ArrayList<Integer>();
 			
-//			if(depth == 0){
-//				// 1. depth == 0 :: 코멘트의 원글.. (그룹삭제) ==> cGroup = cId
-//				
-//				id.add(cId);
-//				
-//				delList.add(cId);
-//				if(cs.commentList(id) != null){
-//					System.out.println(delList);
-//					int val = cs.commentDel(delList,1);
-//					
-//					if(val == 0){
-//						msg = "다시시도하세요";
-//					}else{
-//						msg = "삭제되었습니다.";
-//					}
-//				}
-//				
-//			}else{
-				// 2. depth > 0 :: 대댓글~ (단일삭제) ==> pId = cId
-				// 2-1.cid 값 삭제
-				// 2-2.pid 값으로 cid 셀렉
-				
-				// 2-3. 값이 있을경우 삭제 후 [2-1] 재귀호출
-				
-				id.add(cId);
-				
-				delList.add(cId);
-				if(cs.commentList(id) != null){
-					System.out.println(delList);
-					int val = cs.commentDel(delList);
-					
-					if(val == 0){
-						resultCode = "OK";
-					}else{
-						resultCode = "Fail";
-					}
-				}
-//			}
+			id.add(cId);
 			
+			delList.add(cId); // 원글(삭제 버튼누른 댓글!)
+			
+			if(cs.commentList(id) != null){
+				System.out.println(delList);
+				
+				int val = cs.commentDel(delList); // 댓글 삭제 메소드호출..
+				
+				if(val == 0){
+					resultCode = "OK";
+				}else{
+					resultCode = "Fail";
+				}
+			}else{
+				resultCode = "Fail";
+			}
+		
 			JSONObject json = new JSONObject(); 
 			json.put("code", resultCode);
 			
@@ -168,27 +147,28 @@ public class CommentServlet extends HttpServlet {
 		}
 	}
 	
-	// 자식 key
+	// 삭제할댓글구하기.
 	public List<Integer> commentList(List<Integer> cId) {
-		List<Integer> result = null ,resultData = null; 
+		List<Integer> result = null ,childData = null; 
 	
 		if (cId.isEmpty()) {
-			result = null;
+			result = null;	// 빈값이면 종료.
 		} else {
+			// 댓글 size만큼 loop
 			for(int i=0; i<cId.size(); i++){
-				resultData = service.selectCommentKey(cId.get(i));
+				childData = service.selectCommentKey(cId.get(i));	// 하위 댓글 구하기
 				
-				for(int ii=0; ii<resultData.size(); ii++){
-					delList.add(resultData.get(ii));
+				for(int ii=0; ii<childData.size(); ii++){
+					delList.add(childData.get(ii));	// 리스트에 추가.
 				}
 			}
 			
-			if(!resultData.isEmpty()){
-				// 데이터 값이 있다면,, 재귀호출..
-				CommentServlet ss = new CommentServlet();	
-				ss.commentList(resultData);
+			if(!childData.isEmpty()){
+				// 하위 댓글있으면 재귀호출..
+				CommentServlet cs = new CommentServlet();	
+				cs.commentList(childData);
 			}	
-			result = resultData;
+			result = childData;
 		}
 		return result;
 	}

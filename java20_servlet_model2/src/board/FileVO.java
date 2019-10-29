@@ -3,13 +3,15 @@ package board;
 import java.util.Date;
 
 public class FileVO {
-	private int fId;					// 파일 key
-	private int bid; 					// 게시판 key
-	private String fileName;		// 파일명
+	private int fId;			// 파일 key
+	private int bid; 			// 게시판 key
+	private String fileName;	// 파일명
 	private String fileOrgName;	// 파일 원본 이름
-	private String filePath;			// 파일 경로
-	private String fileSize;			// 파일 사이즈
-	private Date regdate;			// 파일 등록일
+	private String filePath;	// 파일 경로
+	private String fileSize;	// 파일 사이즈
+	private char delYN;			// 삭제상태
+	private char type;			// 첨부파일 타입 (ex.B - 게시판)
+	private Date regdate;		// 파일 등록일
 
 	public int getfId() {
 		return fId;
@@ -47,6 +49,18 @@ public class FileVO {
 	public void setFileSize(String fileSize) {
 		this.fileSize = fileSize;
 	}
+	public char getDelYN() {
+		return delYN;
+	}
+	public void setDelYN(char delYN) {
+		this.delYN = delYN;
+	}
+	public char getType() {
+		return type;
+	}
+	public void setType(char type) {
+		this.type = type;
+	}
 	public Date getRegdate() {
 		return regdate;
 	}
@@ -56,8 +70,8 @@ public class FileVO {
 	
 	@Override
 	public String toString() {
-		return "FileVO [fId=" + fId + ", bid=" + bid + ", fileName=" + fileName
-				+ ", fileOrgName=" + fileOrgName + ", filePath=" + filePath
-				+ ", fileSize=" + fileSize + ", regdate=" + regdate + "]";
+		return "FileVO [fId=" + fId + ", bid=" + bid + ", fileName=" + fileName + ", fileOrgName=" + fileOrgName
+				+ ", filePath=" + filePath + ", fileSize=" + fileSize + ", delYN=" + delYN + ", type=" + type
+				+ ", regdate=" + regdate + "]";
 	}
 }

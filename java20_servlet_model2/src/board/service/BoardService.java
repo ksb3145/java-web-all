@@ -68,14 +68,14 @@ public class BoardService {
 	}
 	
 	// 게시글 그룹 삭제
-		public int boardGroupDel(BoardVO bvo){
-			MemberVO mvo = memberDao.selectOne(bvo.getUserId());
-			if (null != mvo){
-				return boardDao.boardGroupDel(bvo);
-			}else{
-				return 0;
-			}
+	public int boardGroupDel(BoardVO bvo){
+		MemberVO mvo = memberDao.selectOne(bvo.getUserId());
+		if (null != mvo){
+			return boardDao.boardGroupDel(bvo);
+		}else{
+			return 0;
 		}
+	}
 	
 	// key값 조회
 	public BoardVO selectBoardGroupKey(BoardVO bvo){
@@ -97,9 +97,18 @@ public class BoardService {
 		return boardDao.selectView(boardId);
 	}
 	
-	
-	// 게시글 첨부파일 등록
+	// 첨부파일 등록
 	public int FileUpload(FileVO fvo){
 		return boardDao.FileUpload(fvo);
+	}
+	
+	// 파일 리스트
+	public List<FileVO> selectFiles(int boardId){
+		return boardDao.selectFiles(boardId);
+	}
+	
+	// 파일 삭제
+	public int FileDel(FileVO fvo){
+		return boardDao.FileDel(fvo);
 	}
 }

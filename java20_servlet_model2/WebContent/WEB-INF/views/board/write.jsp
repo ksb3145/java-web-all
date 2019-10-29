@@ -9,10 +9,11 @@
 			<h4>글쓰기</h4>
 			
 			<form class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
+			${reqFrm}
 				<c:choose>
 					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
 						<input type="text" id="command" name="command" value="bbsUpdate" />
-						<input type="text" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyUpdate' : 'bbsUpdate'}" />
+						<input type="text" id="reqFrm" name="reqFrm" value="${'bbsUpdateForm' eq reqFrm ? 'bbsUpdate' : 'bbsReplyUpdate'}" />
 						<input type="text" id="boardId" name="boardId" value="${boardDetail.id}" />
 						<input type="text" id="userId" name="userId" value="${boardDetail.userId}" />
 						<input type="text" id="page" name="page" value="${page}" />
@@ -40,8 +41,27 @@
 				</div>
 				
 				<div class="form-group">
-					<label for="file-upload">파일업로드</label>
-					<input type="file" class="form-control" id="file-upload" name="file-upload" />
+					
+					
+					<c:choose>
+						<c:when test="${not empty boardFiles}" >
+							<c:forEach var="obj" items="${boardFiles}" varStatus="status" >
+								<ul>
+									<li>
+										${obj.fileOrgName}
+										<button type="button" class="btn lg red delBtn" data-command="FileDel" data-fileId="${obj.fId}">삭제</button> 
+									</li>
+								</ul>
+							</c:forEach>
+						</c:when>
+						<c:otherwise>
+							<label for="file-upload">파일업로드</label>
+							<input type="file" class="form-control" id="file-upload" name="file-upload" />
+						</c:otherwise>
+					</c:choose>
+					
+						
+					
 				</div>
 				
 				<div class="col-md-12">
@@ -68,6 +88,53 @@
 		
 		
 	</div>
+<script type="text/javascript">
+<!--
+	$(document).ready(function() {
+		//파일 삭제
+		$(".delBtn").on("click",function(e){
+			var data = "";
+			var command = $(this).attr("data-command");
+			var fileId = $(this).attr("data-fileId");
+			url = "/BoardServlet";
+			data = { command:command, fileId:fileId };
+			
+			if(confirm("정말 삭제하시겠습니까?")){
+				callAjax(data, url);
+			}
+		});
+	});
 	
+	
+	function callAjax(data, url){
+		//console.log(data, url);
+		
+		$.ajax({
+			url:url,
+		    async:true,
+		    type:'POST',
+		    data: data,
+		    dataType:'json',
+		    beforeSend:function(jqXHR) {
+		    	$("#loading").css("display","block");
+		    },
+		    success:function(resultData) {
+		    	//console.log(resultData.code);
+		    	$("#loading").css("display","none");
+		    	if(resultData.code == "OK"){
+		    		alert("성공.");
+		    	}else{
+		    		alert("실패 다시시도하세요.");		    		
+		    	}
+				location.reload();
+		    },
+		    error:function(request,status,error){
+		    	alert("등록실패 다시시도하세요.");
+			   console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+			}
+	    });	
+	}
+-->
+</script>
 <jsp:include page="../common/footer.jsp" flush="false"></jsp:include>
 

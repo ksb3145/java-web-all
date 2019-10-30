@@ -102,7 +102,12 @@ public class BoardService {
 		return boardDao.FileUpload(fvo);
 	}
 	
-	// 파일 리스트
+	// 파일 (where = file key)
+	public FileVO selectOneFile(FileVO fvo){
+		return boardDao.selectOneFile(fvo);
+	}
+		
+	// 파일 리스트 (where = board key)
 	public List<FileVO> selectFiles(int boardId){
 		return boardDao.selectFiles(boardId);
 	}

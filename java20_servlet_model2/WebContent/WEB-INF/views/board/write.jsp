@@ -9,22 +9,22 @@
 			<h4>글쓰기</h4>
 			
 			<form name="frm" id="frm" class="form-horizontal" action="/BoardServlet" method="post" enctype="multipart/form-data">
-			${reqFrm}
+
 				<c:choose>
 					<c:when test="${not empty boardDetail.id && reqFrm ne 'insert'}" >
-						<input type="text" id="command" name="command" value="bbsUpdate" />
-						<input type="text" id="reqFrm" name="reqFrm" value="${'bbsUpdateForm' eq reqFrm ? 'bbsUpdate' : 'bbsReplyUpdate'}" />
-						<input type="text" id="boardId" name="boardId" value="${boardDetail.id}" />
-						<input type="text" id="userId" name="userId" value="${boardDetail.userId}" />
-						<input type="text" id="page" name="page" value="${page}" />
+						<input type="hidden" id="command" name="command" value="bbsUpdate" />
+						<input type="hidden" id="reqFrm" name="reqFrm" value="${'bbsUpdateForm' eq reqFrm ? 'bbsUpdate' : 'bbsReplyUpdate'}" />
+						<input type="hidden" id="boardId" name="boardId" value="${boardDetail.id}" />
+						<input type="hidden" id="userId" name="userId" value="${boardDetail.userId}" />
+						<input type="hidden" id="page" name="page" value="${page}" />
 					</c:when>
 					<c:otherwise>
-						<input type="text" id="command" name="command" value="bbsInsert" />
-						<input type="text" id="page" name="page" value="${page}" />
-						<input type="text" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyInsert' : ''}" />
-						<input type="text" id="userId" name="userId" value="${sessionVO.userId}" />
-						<input type="text" id="boardId" name="boardId" value="${boardId}" />
-						<input type="text" id="bGroup" name="bGroup" value="${0 eq boardDetail.bGroup ? boardDetail.id : boardDetail.bGroup}" />
+						<input type="hidden" id="command" name="command" value="bbsInsert" />
+						<input type="hidden" id="page" name="page" value="${page}" />
+						<input type="hidden" id="reqFrm" name="reqFrm" value="${not empty reqFrm ? 'bbsReplyInsert' : ''}" />
+						<input type="hidden" id="userId" name="userId" value="${sessionVO.userId}" />
+						<input type="hidden" id="boardId" name="boardId" value="${boardId}" />
+						<input type="hidden" id="bGroup" name="bGroup" value="${0 eq boardDetail.bGroup ? boardDetail.id : boardDetail.bGroup}" />
 					</c:otherwise>
 				</c:choose>
 				
@@ -44,7 +44,7 @@
 					
 					
 					<c:choose>
-						<c:when test="${not empty boardFiles}" >
+						<c:when test="${not empty boardFiles && reqFrm ne 'insert'}" >
 							<c:forEach var="obj" items="${boardFiles}" varStatus="status" >
 								<ul>
 									<li>
@@ -73,7 +73,7 @@
 						</li>
 						<li class="float-r">
 							<c:choose>
-								<c:when test="${not empty boardDetail.id && sessionVO.userId ne null}" >
+								<c:when test="${not empty boardDetail.id && sessionVO.userId ne null && reqFrm ne 'insert'}" >
 									<button type="submit" class="btn btn-warning">수정</button>
 								</c:when>
 								<c:otherwise>
@@ -123,9 +123,7 @@
 		    success:function(resultData) {
 		    	//console.log(resultData.code);
 		    	$("#loading").css("display","none");
-		    	if(resultData.code == "OK"){
-		    		alert("성공.");
-		    	}else{
+		    	if(resultData.code != "OK"){
 		    		alert("실패 다시시도하세요.");		    		
 		    	}
 				location.reload();

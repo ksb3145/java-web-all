@@ -1,7 +1,9 @@
 package board.servlet;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,7 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.jni.File;
+
 
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
@@ -29,12 +31,12 @@ import board.BoardVO;
 import board.FileVO;
 import board.service.BoardService;
 import board.service.CommentService;
+import common.util.FileDownloadUtil;
 import common.util.StringUtil;
 
 //@WebServlet("/BoardServlet")
 public class BoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static String fileDir = "";
 	   
     private BoardService service;
 	public BoardServlet() {
@@ -72,11 +74,10 @@ public class BoardServlet extends HttpServlet {
 		System.out.println("page ::: "+page);
 		
 		if(command == " "){
-
-			//ServletContext cxt = getServletContext();
-			//fileDir = cxt.getRealPath("/upload/bbs");	// 파일 저장 경로
-			fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
-			System.out.println(fileDir);
+			
+			//fileDir = getServletContext().getRealPath("/upload/bbs");
+//			fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
+//			System.out.println(fileDir);
 			
 			BoardServlet bs = new BoardServlet();
 			bs.boardMultipart(req,resp);
@@ -126,15 +127,15 @@ public class BoardServlet extends HttpServlet {
 			// S: tag
 			paging += "<ul class='pagination'>";
 			if (startPage > 1){
-				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page=1'>처음</a></li>";
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page=1"+location+"'>처음</a></li>";
 			}
 			if (page > 1) {
-				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ (page-1) +"'>이전</a></li>";
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ (page-1) + location +"'>이전</a></li>";
 			}
 			
 			for (int i=startPage; i<=endPage; i++) {
 				paging += "<li class='page-item'>";
-				paging += "<a class='page-link' href='"+ url +"&page="+ i +"'>";
+				paging += "<a class='page-link' href='"+ url +"&page="+ i + location+"'>";
 				    if (i == page){
 				    	paging += "<b>"+ i +"</b>";
 				    }else{
@@ -145,10 +146,10 @@ public class BoardServlet extends HttpServlet {
 			}
 
 			if (page < totalPage) {
-				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ (page+1) +"'>다음</a></li>";
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ (page+1) + location +"'>다음</a></li>";
 			}
 			if (endPage < totalPage) {
-				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ totalPage +"'>끝</a></li>";
+				paging += "<li class='page-item'><a class='page-link' href='"+ url +"&page="+ totalPage + location +"'>끝</a></li>";
 			}
 			paging += "</ul>";
 			// E: tag
@@ -159,6 +160,7 @@ public class BoardServlet extends HttpServlet {
 			resultData.put("page", page);
 			resultData.put("paging", paging);
 			resultData.put("rownum", boardNumber);
+			resultData.put("location", location);
 			
 			params.put("page", page);
 			params.put("limit", limit);
@@ -302,7 +304,7 @@ public class BoardServlet extends HttpServlet {
 			BoardVO resultGroupNum = service.selectBoardGroupKey(bvo);
 			
 			// 그룹넘 null => 답글 없음
-			if(!resultGroupNum.equals("")){
+			if(!resultGroupNum.equals("") && resultGroupNum != null){
 				//1-1. 답글 있음.
 				bvo.setbGroup(resultGroupNum.getbGroup());
 			}
@@ -374,20 +376,100 @@ public class BoardServlet extends HttpServlet {
 		    
 		    PrintWriter out = resp.getWriter();
 		    out.print(json);
+		    
 		}else if(command.equals("FileDownLoad")){
-//			File file = new File("C:\\temp\\downloadfilename.csv");
-//			FileInputStream fileIn = new FileInputStream(file);
-//			ServletOutputStream out = resp.getOutputStream();
-//			 
-//			byte[] outputByte = new byte[4096];
-//			//copy binary contect to output stream
-//			while(fileIn.read(outputByte, 0, 4096) != -1)
-//			{
-//				out.write(outputByte, 0, 4096);
+			
+			int fId = 0;
+			// 절대경로
+			String fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
+			//String fileDir = getServletContext().getRealPath("/upload/bbs");
+			System.out.println("fileDir = "+fileDir);
+			
+			String fileId = StringUtil.strNullCheck(req.getParameter("fileId"));	// 파일 key
+			if(!" ".equals(fileId)) fId = Integer.parseInt(fileId);
+			
+			if(fId>0){
+				FileVO fvo = new FileVO();
+				fvo.setfId(fId);
+				
+				FileVO resultFile = service.selectOneFile(fvo);
+				if(resultFile != null){
+					String fileName = resultFile.getFileName();
+					//String getFileOrgName = resultFile.getFileOrgName();	//파일원본명
+					
+					File file = new File(fileDir+"/"+fileName);
+					FileDownloadUtil.download(req, resp, file, resultFile);
+					
+				}else{
+					//  파일 없음.
+				}
+				
+			}else{
+				// fid값 없음.
+			}
+			
+			
+			
+			//File f = new File("c:\\jdk1.5\\work\\ch14\\FileEx1.java");
+			
+//			
+//			int fId = 0;
+//			String resultCode = "";
+//			String fileId = StringUtil.strNullCheck(req.getParameter("fileId"));
+//			
+//			if(!" ".equals(fileId)) fId = Integer.parseInt(fileId);
+//			
+//			if(fId>0){
+//				FileVO fvo = new FileVO();
+//				fvo.setfId(fId);
+//				
+//				FileVO result = service.selectOneFile(fvo);
+//				
+//				if(result != null){
+//					resultCode = "OK";
+//					
+//					String filePath = "";
+//					File downloadFile = new File(filePath);
+//					FileInputStream inStream = new FileInputStream(downloadFile);
+//					
+//					//ServletContext cxt = getServletContext();
+//					String realtivePath = getServletContext().getRealPath("");
+//					System.out.println("realtivePath = "+realtivePath);
+//					
+//					ServletContext context = getServletContext();
+//					
+//					String mimeType = context.getMimeType(filePath);
+//					if(mimeType == null){
+//						mimeType = "application/actet-stream";
+//					}
+//					System.out.println("MINI type : "+mimeType );
+//					
+//					resp.setContentType(mimeType);
+//					resp.setContentLength((int) downloadFile.length() );
+//					
+//					String headerKey = "Content-Disposition";
+//					String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName() );
+//					resp.setHeader(headerKey, headerValue);
+//					
+//					OutputStream outStream = resp.getOutputStream();
+//					
+//					byte[] buffer = new byte[4096];
+//					int bytesRead = -1;
+//					
+//					while ( (bytesRead = inStream.read(buffer)) != -1 ){
+//						outStream.write(buffer,0,bytesRead);
+//					}
+//					
+//					inStream.close();
+//					outStream.close();
+//					
+//				}else{
+//					resultCode = "E11"; // 결과 값 없음.
+//				}
+//				
+//			}else{
+//				resultCode = "E00";	// fid값 없음.
 //			}
-//			fileIn.close();
-//			out.flush();
-//			out.close();
 		}
 	}
 	
@@ -395,15 +477,15 @@ public class BoardServlet extends HttpServlet {
 	// 게시글/댓글 삭제 (삭제=상태값 변경)
 	public String delContents(BoardVO bvo){
 		String resultVal = "";
-		int resultData = 0;
+		int resultData = 0, cmtResult = 0;
 		
 		CommentService cmtService = new CommentService();
 		
-		// 코멘트 카운트 체크 빠짐..!<추가하기>
-		int cmtResult = cmtService.commentBidDel(bvo.getId());	// 코멘트 삭제
+			
+			int cmtCount = cmtService.selectCommentCount(bvo.getId()); // 코멘트 카운트
+			if(cmtCount > 0) cmtResult = cmtService.commentBidDel(bvo.getId());	// 코멘트 삭제
 		
-		//if( cmtResult>0){
-			if(bvo.getbGroup() == 0){
+			if(bvo.getPid() == 0){
 				resultData = service.boardDel(bvo);	// 게시글 삭제
 			}else{
 				resultData = service.boardGroupDel(bvo);	// 게시글 그룹 삭제 (원글의 하위글까지 모두 삭제)
@@ -413,9 +495,6 @@ public class BoardServlet extends HttpServlet {
 			}else{
 				resultVal = "Fail";
 			}
-//		}else{
-//			resultVal = "Fail";
-//		}
 		
 		return resultVal;
 	}
@@ -423,11 +502,17 @@ public class BoardServlet extends HttpServlet {
 	// 파일첨부..( 글쓰기/수정)
 	public void boardMultipart(HttpServletRequest req, HttpServletResponse resp){
 		// 설정
-		String location = "", pno = "" , command = "";
+		String location = "", pno = "" , command = "", msgCode = "";
 		// 게시판 입력값
 		String reqFrm = "",  boardId = "", bGroup = "", userId = "", title = "", content = "", fileUploadYN = "";
 		// 파일
-		String fileName = "" , realFileName = "";
+		String fileName = "" , realFileName = "", fileExt = "";
+		long fileSize = 0;
+		
+		
+		//String fileDir = getServletContext().getRealPath("/upload/bbs");
+		String fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
+		System.out.println(fileDir);
 		
 		try {
 	        // 파일 업로드...
@@ -456,16 +541,20 @@ public class BoardServlet extends HttpServlet {
 
 			if(command.equals("bbsInsert")){
 				// 게시글 등록 / 답글 등록
+				
+				msgCode = "실패";
+				
 				if( reqFrm.equals("bbsReplyInsert")){ 
 					group = Integer.parseInt(bGroup);
 					
 					bvo.setPid(pid);			//게시글 부모키
 					bvo.setbGroup(group);	// 게시글 그룹 값
+					bvo.setbSort(2);	// 수정하기
 					
 					insertId = service.boardReInsert(bvo); // 답글 등록
 					if(0<insertId){
 						bvo.setId(insertId);
-						//result = service.boardSortNOUpdate(bvo);	// 게시글 그룹값 update
+						result = service.boardSortNOUpdate(bvo);	// 게시글 그룹값 update
 					}
 				}else{
 					insertId = service.boardInsert(bvo);	// 게시글 등록
@@ -473,10 +562,11 @@ public class BoardServlet extends HttpServlet {
 						// 원글 자신의 키값을 그룹 값에 넣어줌
 						bvo.setId(insertId);			// 등록된 게시글의 key값
 						bvo.setbGroup(insertId);	// 게시글 그룹 값
-						//result = service.boardGroupNOUpdate(bvo);	// 게시글 그룹값 update
+						result = service.boardGroupNOUpdate(bvo);	// 게시글 그룹값 update
 					}
 				}
-				result = service.boardSortNOUpdate(bvo);	// 게시글 그룹값 update
+				
+				if(result>0) msgCode = "성공";
 				
 				location = "/BoardServlet?command=bbsList&page="+pno;
 				
@@ -490,6 +580,7 @@ public class BoardServlet extends HttpServlet {
 				if(result>0){
 					// 등록 성공
 					location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+pno;
+					msgCode = "성공";
 				}else{
 					// 등록 실패
 					location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+pno;
@@ -497,57 +588,63 @@ public class BoardServlet extends HttpServlet {
 			}
 			
 			// 등록/수정 성공! 파일첨부!
-			if(result>0 && fileUploadYN == "Y"){
+			if(result>0){
 				
-				// 파일설정
-				String uploadDate = new SimpleDateFormat("yyMMddHmsS").format(new Date());	//현재시간
-				Enumeration files = multi.getFileNames();	//Enumeration 
-				String str = (String) files.nextElement();	// 파일
-				fileName = multi.getFilesystemName(str);	// 파일명
-				String bbsPath = "/upload/bbs";
-				
-				// 게시글 등록/수정 후, 파일 등록있으면 등록
-				if(null != fileName){
-						// S: 파일등록
-				        int i = -1;
-				        i = fileName.lastIndexOf(".");	// 파일 확장자 위치
-				        realFileName = uploadDate+fileName.substring(i,fileName.length());	// 현재시간과 확장자 합치기..
-				        
-				        System.out.println("fileDir ::: " + fileDir);
-				        
-				        java.io.File oldFile = new  java.io.File(fileDir+"/"+fileName);
-				        java.io.File newFile = new java.io.File(fileDir+"/"+realFileName);
-				        oldFile.renameTo(newFile);		// 파일명 날짜로 변경..
-						
-				        // 파일첨부 게시판 등록.. 
-				        // 추가 할 기능: 확장자,파일사이즈 (확장자/용량 제한)
-				        FileVO fvo = new FileVO();
-				        fvo.setBid(bvo.getId());
-				        fvo.setFileName(realFileName);
-				        fvo.setFileOrgName(fileName);
-				        fvo.setFilePath(bbsPath);				        
-				        //fvo.setFileSize(fileSize);
-				        
-				        int fileResult = service.FileUpload(fvo);
-				        
-				        if(fileResult>0){
-				        	req.setAttribute("msg", "성공");
-				        }else{
-				        	req.setAttribute("msg", "실패");
-				        }
-				        // E: 파일등록
-				   
+				if(fileUploadYN.equals("Y")){
+					
+					// 파일설정
+					String uploadDate = new SimpleDateFormat("yyMMddHmsS").format(new Date());	//현재시간
+					Enumeration files = multi.getFileNames();	//Enumeration 
+					String str = (String) files.nextElement();	// 파일
+					fileName = multi.getFilesystemName(str);	// 파일명
+					String bbsPath = "/upload/bbs";
+
+//					File filess = multi.getFile("fileName");
+//					fileSize = filess.length();
+					
+					// 게시글 등록/수정 후, 파일 등록있으면 등록
+					if(null != fileName){
+							// S: 파일등록
+					        int  pos = -1;
+					        pos = fileName.lastIndexOf(".");	// 파일 확장자 위치
+					        realFileName = uploadDate+fileName.substring(pos,fileName.length());	// 현재시간과 확장자 합치기..
+					        fileExt = fileName.substring(pos+1);	// 파일확장자
+					        
+					        System.out.println("fileDir ::: " + fileDir);
+					        
+					        java.io.File oldFile = new  java.io.File(fileDir+"/"+fileName);
+					        java.io.File newFile = new java.io.File(fileDir+"/"+realFileName);
+					        oldFile.renameTo(newFile);		// 파일명 날짜로 변경..
+							
+					        // 파일첨부 게시판 등록.. 
+					        // 추가 할 기능: 확장자,파일사이즈 (확장자/용량 제한)
+					        FileVO fvo = new FileVO();
+					        fvo.setBid(bvo.getId());
+					        fvo.setFileName(realFileName);
+					        fvo.setFileOrgName(fileName);
+					        fvo.setFilePath(bbsPath);	
+					        fvo.setFileExt(fileExt);
+					        //fvo.setFileSize(fileSize);
+					        
+					        int fileResult = service.FileUpload(fvo);
+					        
+					        if(fileResult>0){
+					        	msgCode = "성공";
+					        }
+					        // E: 파일등록
+					   
+					}
+					
 				}else{
-					req.setAttribute("msg", "성공");
+					msgCode = "성공";
 				}
+				
 		        
-			}else{
-				// 등록 실패
-				req.setAttribute("msg", "실패");	
 			}
 			
 			
 			
+			req.setAttribute("msg", msgCode);
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
 			

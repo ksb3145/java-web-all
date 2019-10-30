@@ -24,7 +24,11 @@
 <!-- 결과 메시지 -->
 <c:if test="${not empty msg}">
 	<script type="text/javascript">
-		alert('${msg}');
+		var msg = ${msg};
+		// 임시.. 수정하기!
+		if(msg != "성공"){
+			alert(msg);
+		}
 	</script>
 </c:if>
 

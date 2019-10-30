@@ -36,7 +36,7 @@ public class CommentService {
 		return commentDao.commentDel(cId);
 	}
 	
-	//
+	// 코멘트 자식 리스트
 	public List<Integer> selectCommentKey(int cId){
 		return commentDao.selectCommentKey(cId);
 	}
@@ -46,4 +46,8 @@ public class CommentService {
 		return commentDao.selectCommentList(boardId);	
 	}
 	
+	// 게시글 코멘트 카운트
+	public int selectCommentCount(int boardId){
+		return commentDao.selectCommentCount(boardId);
+	}
 }

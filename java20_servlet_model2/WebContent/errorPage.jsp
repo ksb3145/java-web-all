@@ -7,6 +7,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-ERROR
+페이지 요청 실패..(404, 없는 페이지)
 </body>
 </html>

@@ -19,8 +19,45 @@ public class CommentDao {
 	}
 	
 	//등록된 코멘트 카운트
-	public int commentCnt(CommentVO cvo){
-		return 0;
+	public int selectCommentCount(int bId){
+		int result = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String sql  = "SELECT count(*) cnt FROM mvc_comment WHERE bid = ?"; 
+		System.out.println("등록된 코멘트 카운트 :: " + sql);
+		try{	
+			DBconn.dbConn = DBconn.getConnection();
+			
+			//sql 실행객체 생성
+			pstmt = DBconn.dbConn.prepareStatement(sql);
+			// ? 에 입력될 값 매핑
+			pstmt.setInt(1, bId);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+				result = rs.getInt("cnt");
+			}
+
+		}catch( SQLException e ) {
+			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			
+			try {
+				if( null != pstmt) pstmt.close();
+			} catch ( SQLException e ) {
+				e.printStackTrace();
+			}
+			
+			try {
+				if(null != DBconn.dbConn) DBconn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 	
 	//코멘트 등록
@@ -30,7 +67,7 @@ public class CommentDao {
 		
 		String sql  = "INSERT INTO mvc_comment( bid, cmtGroup, pid, sort, depth, contents, mUserId, regdate) "; 
 			   sql += "VALUES ( ?, 	?,	?,	?,	?,	?,	?, now())";
-		
+		System.out.println("코멘트등록 :: " + sql);
 		try{	
 			DBconn.dbConn = DBconn.getConnection();
 			
@@ -75,17 +112,17 @@ public class CommentDao {
 	}
 	
 	// 코멘트 key
-	public List<Integer> selectCommentKey(int cid){
+	public List<Integer> selectCommentKey(int cId){
 		List<Integer> commentCidList = new ArrayList<>();
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		
 		String sql = "SELECT cId FROM mvc_comment WHERE pId=?";
-		System.out.println(sql);
+		System.out.println("코멘트 key :: "+sql);
 		try{
 			DBconn.dbConn = DBconn.getConnection();
 			pstmt = DBconn.dbConn.prepareStatement( sql );
-			pstmt.setInt(1,cid);
+			pstmt.setInt(1,cId);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()){
@@ -132,7 +169,7 @@ public class CommentDao {
 		   		  sql += " GROUP BY t1.cid";
 		   		  sql += " ORDER BY t1.cmtGroup ASC, t1.sort ASC, t1.regdate ASC";
 		
-		   		  System.out.println(sql);
+		   		  System.out.println("코멘트 리스트 :: "+sql);
 		try{
 			DBconn.dbConn = DBconn.getConnection();
 			
@@ -188,7 +225,7 @@ public class CommentDao {
 		String sql  = "UPDATE mvc_comment";
 			   sql +=   " SET cmtGroup = ?";
 			   sql += " WHERE cid = ?";
-		
+		System.out.println("코멘트 그룹 업데이트 :: "+sql);
 		try{	
 			DBconn.dbConn = DBconn.getConnection();
 			
@@ -224,7 +261,7 @@ public class CommentDao {
 		PreparedStatement pstmt = null;
 		
 		String sql = "UPDATE mvc_comment SET sort = sort+1 WHERE bid = ? AND ?<depth";
-		
+		System.out.println("코멘트 그룹순서 증가 (정렬) :: "+sql);
 		try{
 			DBconn.dbConn = DBconn.getConnection();
 			
@@ -259,20 +296,20 @@ public class CommentDao {
 		
 	// 코멘트 삭제(단일) ==> pId = cId
 	// selectCommentKey(int cid) 로 조회한 cid의 하위뎁스 지우기
-	public int commentDel(int cid){
+	public int commentDel(int cId){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
 		//String sql = "DELETE FROM mvc_comment WHERE  delYN = 'N' AND pId = ?";
 		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE  delYN = 'N' AND cid = ?";
 		
-		System.out.println(sql);
+		System.out.println("코멘트 삭제 :: "+sql);
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();
 			
 			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, cid);
+			pstmt.setInt(1, cId);
 			
 			result = pstmt.executeUpdate();
 			
@@ -298,19 +335,19 @@ public class CommentDao {
 	}
 	
 	// 코멘트 삭제(그룹) ==> bid(게시글 key) = cId
-	public int commentBidDel(int cid){
+	public int commentBidDel(int cId){
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
 		//String sql = "DELETE FROM mvc_comment WHERE  delYN = 'N' AND cmtGroup = ?";
 		String sql = "UPDATE mvc_comment SET delYN = 'Y' WHERE delYN = 'N' AND bid = ?";
-		System.out.println(sql);
+		System.out.println("코멘트 삭제(그룹) :: "+sql);
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();
 			
 			pstmt = DBconn.dbConn.prepareStatement(sql);
-			pstmt.setInt(1, cid);
+			pstmt.setInt(1, cId);
 			
 			result = pstmt.executeUpdate();
 			
@@ -334,4 +371,6 @@ public class CommentDao {
 		
 		return result;
 	}
+
+	
 }

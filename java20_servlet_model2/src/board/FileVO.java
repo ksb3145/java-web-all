@@ -9,6 +9,7 @@ public class FileVO {
 	private String fileOrgName;	// 파일 원본 이름
 	private String filePath;	// 파일 경로
 	private String fileSize;	// 파일 사이즈
+	private String fileExt;	// 파일 확장자
 	private char delYN;			// 삭제상태
 	private char type;			// 첨부파일 타입 (ex.B - 게시판)
 	private Date regdate;		// 파일 등록일
@@ -49,6 +50,13 @@ public class FileVO {
 	public void setFileSize(String fileSize) {
 		this.fileSize = fileSize;
 	}
+	
+	public String getFileExt() {
+		return fileExt;
+	}
+	public void setFileExt(String fileExt) {
+		this.fileExt = fileExt;
+	}
 	public char getDelYN() {
 		return delYN;
 	}
@@ -67,11 +75,12 @@ public class FileVO {
 	public void setRegdate(Date regdate) {
 		this.regdate = regdate;
 	}
-	
 	@Override
 	public String toString() {
-		return "FileVO [fId=" + fId + ", bid=" + bid + ", fileName=" + fileName + ", fileOrgName=" + fileOrgName
-				+ ", filePath=" + filePath + ", fileSize=" + fileSize + ", delYN=" + delYN + ", type=" + type
-				+ ", regdate=" + regdate + "]";
+		return "FileVO [fId=" + fId + ", bid=" + bid + ", fileName=" + fileName
+				+ ", fileOrgName=" + fileOrgName + ", filePath=" + filePath
+				+ ", fileSize=" + fileSize + ", fileExt=" + fileExt
+				+ ", delYN=" + delYN + ", type=" + type + ", regdate="
+				+ regdate + "]";
 	}
 }

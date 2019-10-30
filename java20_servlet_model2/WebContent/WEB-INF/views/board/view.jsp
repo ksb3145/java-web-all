@@ -45,16 +45,18 @@
 							<th>작성일</th>
 							<td>${boardDetail.regDate}</td>
 						</tr>
+						<c:if test="${not empty boardFiles}" >
 						<tr>
 							<th>첨부파일</th>
 							<td colspan="3">
 								<ul>
 									<c:forEach var="obj" items="${boardFiles}" varStatus="status" >
-									<li>${obj.fileOrgName} </li>
+									<li><a href="/BoardServlet?command=FileDownLoad&fileId=${obj.fId}">${obj.fileOrgName}</a></li>
 									</c:forEach>
 								</ul>
 							</td>
 						</tr>
+						</c:if>
 						<tr>
 							<td colspan="4">${boardDetail.content}</td>
 						</tr>
@@ -100,6 +102,7 @@
 
 				<div class="card-deck mb-3">
 					<div class="card md-4 shadow-sm">
+						<!-- s: 댓글 입력폼 -->
 						<div class="card-header">
 							<form class="form-inline">
 								<ul class="list-inline">
@@ -114,7 +117,10 @@
 								</ul>
 							</form>
 						</div>
-								
+						<!-- e: 댓글 입력폼 -->
+						
+						<!-- s: 댓글 리스트 -->
+						<c:if test="${not empty commentList}" >
 						<div class="commentArea card-body ">
 							<ul>
 								<c:forEach var="obj" items="${commentList}">
@@ -126,8 +132,6 @@
 											<dd>
 												${obj.userId} <span class="date">${obj.regdate}</span>
 												<c:if test="${sessionVO.userId == obj.userId}">	
-													${obj.cId}/${obj.pId}/${obj.depth}
-													<br/>
 													<span class="delBtn btn sm red" data-cid="${obj.cId}" data-depth="${obj.depth}" data-command="cmtDelete">삭제</span>
 												</c:if>
 												<span class="reComment btn sm black mgReset" data-cid="${obj.cId}" data-cmtdepth="${obj.depth}" data-cmtsort="${obj.sort}" data-cmtgroup="${obj.cmtGroup}">댓글</span>
@@ -138,6 +142,8 @@
 								</c:forEach>
 							</ul>
 						</div>
+						</c:if>
+						<!-- e: 댓글 리스트 -->
 						
 					</div>
 				</div>
@@ -255,9 +261,7 @@
 		    	//console.log(resultData.code);
 		    	$("#loading").css("display","none");
 		    	
-		    	if(resultData.code == "OK"){
-		    		alert("성공.");
-		    	}else{
+		    	if(resultData.code == "Fail"){
 		    		alert("실패 다시시도하세요.");		    		
 		    	}
 		    
@@ -269,7 +273,9 @@
 		    	
 		    },
 		    error:function(request,status,error){
-		    	alert("등록실패 다시시도하세요.");
+		    	$("#loading").css("display","none");
+		    	alert("다시시도하세요.");
+		    	
 			   console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 			}
         });	

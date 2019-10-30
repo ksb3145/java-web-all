@@ -5,6 +5,13 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
 	id="WebApp_ID" version="3.0">
   <display-name>java01_servlet_model1</display-name>
+  
+  <!-- S: 세션 유지 시간 (단위:분, 톰켓 세션타임아웃 기본 설정시간은 30분) -->
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  <!-- E: 세션 유지 시간 -->
+  
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
     <welcome-file>index.htm</welcome-file>
@@ -13,6 +20,21 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  
+  <!-- S: 로그인 필터 -->
+  <filter>
+          <filter-name>LoginCheck</filter-name>
+          <filter-class>filter.LoginCheckFilter</filter-class>
+  </filter>
+  <filter-mapping>
+          <filter-name>LoginCheck</filter-name>
+          <url-pattern>/BoardServlet</url-pattern>
+          <url-pattern>/CommentServlet</url-pattern>
+          <url-pattern>/DownloadFileServlet</url-pattern>
+  </filter-mapping>
+  <!-- E: 로그인 필터 -->
+  
+  <!-- S: 로그인 서블릿 -->
   <servlet>
     <servlet-name>Login</servlet-name>
     <servlet-class>member.servlet.LoginServlet</servlet-class>
@@ -21,7 +43,8 @@
     <servlet-name>Login</servlet-name>
     <url-pattern>/loginServlet</url-pattern>
   </servlet-mapping>
-  
+  <!-- E: 로그인 서블릿 -->
+  <!-- S: 게시판 서블릿 -->
   <servlet>
     <servlet-name>Board</servlet-name>
     <servlet-class>board.servlet.BoardServlet</servlet-class>
@@ -30,6 +53,8 @@
     <servlet-name>Board</servlet-name>
     <url-pattern>/BoardServlet</url-pattern>
   </servlet-mapping>
+  <!-- E: 게시판 서블릿 -->
+  <!-- S: 댓글 서블릿 -->
   <servlet>
     <servlet-name>Comment</servlet-name>
     <servlet-class>board.servlet.CommentServlet</servlet-class>
@@ -38,27 +63,31 @@
     <servlet-name>Comment</servlet-name>
     <url-pattern>/CommentServlet</url-pattern>
   </servlet-mapping>
+  <!-- E: 댓글 서블릿 -->
+  <!-- S: 파일다운로드 서블릿 -->
+  <servlet>
+    <servlet-name>DownloadFile</servlet-name>
+    <servlet-class>board.servlet.DownloadFileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DownloadFile</servlet-name>
+    <url-pattern>/DownloadFileServlet</url-pattern>
+  </servlet-mapping>
+  <!-- E: 파일다운로드 서블릿 -->
   
-  <!-- <error-page>
-    <error-code>404</error-code>
+  <!-- S: 에러페이지 설정 -->
+  <error-page>
+  	<error-code>404</error-code>
     <location>/errorPage.jsp</location>
   </error-page>
-  <error-page>
-    <error-code>500</error-code>
-    <location>/errorPage.jsp</location>
-  </error-page> -->
+  <!-- E: 에러페이지 설정 -->
   
-  <session-config>
-    <session-timeout>60</session-timeout>
-  </session-config>
-  <!-- 타임아웃 단위 (분) -->
-  
-	<resource-ref>
+	<!-- <resource-ref>
 		<description>connection</description>
 		<res-ref-name>jdbc/mysql</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
 		<res-auth>Container</res-auth>
-	</resource-ref>
+	</resource-ref> -->
 	<!--
 		description : 설명
 		res-ref-name : JDBC 이름, <Resource>의 name 부분과 동일하게 입력

@@ -119,17 +119,12 @@ public class CommentServlet extends HttpServlet {
 			id.add(cId);
 			
 			delList.add(cId); // 원글(삭제 버튼누른 댓글!)
-			
+			resultCode = "OK";
 			if(cs.commentList(id) != null){
 				System.out.println(delList);
 				
 				int val = cs.commentDel(delList); // 댓글 삭제 메소드호출..
 				
-				if(val == 0){
-					resultCode = "OK";
-				}else{
-					resultCode = "Fail";
-				}
 			}else{
 				resultCode = "Fail";
 			}

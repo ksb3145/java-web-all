@@ -33,12 +33,12 @@ span.btn { cursor: pointer; }
 .sm { font-size: 10px; padding: 3px 5px; }
 .md { font-size: 13px; padding: 5px 10px; }
 .lg { font-size: 15px; padding: 5px 10px; }
-.btn { vertical-align: middle; border-radius: 5px;   font-weight: bold; }
-.black { background: #333; color: #fff; }
-.gray { background: gray; color: #fff; }
-.red { background: red; color: #fff; }
-.green { background: green; color: #fff; }
-.btn:hover { background: yellow; color: #333; border:1px solid #eee; }
+.btn { vertical-align: middle !important; border-radius: 5px !important;   font-weight: bold !important;  }
+.black { background-color: #333 !important; color: #fff !important; }
+.gray { background-color: gray !important; color: #fff !important; }
+.red { background-color: red !important; color: #fff !important; }
+.green { background-color: green !important; color: #fff !important; }
+.btn:hover { background-color: yellow !important; color: #333; border:1px solid #eee !important; }
 
 
 /*·Îµù*/

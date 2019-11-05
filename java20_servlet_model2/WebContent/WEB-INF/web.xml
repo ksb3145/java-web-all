@@ -6,82 +6,101 @@
 	id="WebApp_ID" version="3.0">
   <display-name>java01_servlet_model1</display-name>
   
-  <!-- S: 세션 유지 시간 (단위:분, 톰켓 세션타임아웃 기본 설정시간은 30분) -->
-  <session-config>
-    <session-timeout>30</session-timeout>
-  </session-config>
-  <!-- E: 세션 유지 시간 -->
-  
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-  </welcome-file-list>
-  
-  <!-- S: 로그인 필터 -->
-  <filter>
-          <filter-name>LoginCheck</filter-name>
-          <filter-class>filter.LoginCheckFilter</filter-class>
-  </filter>
-  <filter-mapping>
-          <filter-name>LoginCheck</filter-name>
-          <url-pattern>/BoardServlet</url-pattern>
-          <url-pattern>/CommentServlet</url-pattern>
-          <url-pattern>/DownloadFileServlet</url-pattern>
-  </filter-mapping>
-  <!-- E: 로그인 필터 -->
-  
-  <!-- S: 로그인 서블릿 -->
-  <servlet>
-    <servlet-name>Login</servlet-name>
-    <servlet-class>member.servlet.LoginServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Login</servlet-name>
-    <url-pattern>/loginServlet</url-pattern>
-  </servlet-mapping>
-  <!-- E: 로그인 서블릿 -->
-  <!-- S: 게시판 서블릿 -->
-  <servlet>
-    <servlet-name>Board</servlet-name>
-    <servlet-class>board.servlet.BoardServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Board</servlet-name>
-    <url-pattern>/BoardServlet</url-pattern>
-  </servlet-mapping>
-  <!-- E: 게시판 서블릿 -->
-  <!-- S: 댓글 서블릿 -->
-  <servlet>
-    <servlet-name>Comment</servlet-name>
-    <servlet-class>board.servlet.CommentServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Comment</servlet-name>
-    <url-pattern>/CommentServlet</url-pattern>
-  </servlet-mapping>
-  <!-- E: 댓글 서블릿 -->
-  <!-- S: 파일다운로드 서블릿 -->
-  <servlet>
-    <servlet-name>DownloadFile</servlet-name>
-    <servlet-class>board.servlet.DownloadFileServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DownloadFile</servlet-name>
-    <url-pattern>/DownloadFileServlet</url-pattern>
-  </servlet-mapping>
-  <!-- E: 파일다운로드 서블릿 -->
-  
-  <!-- S: 에러페이지 설정 -->
-  <error-page>
-  	<error-code>404</error-code>
-    <location>/errorPage.jsp</location>
-  </error-page>
-  <!-- E: 에러페이지 설정 -->
-  
+	 <!-- S: 세션 유지 시간 (단위:분, 톰켓 세션타임아웃 기본 설정시간은 30분) -->
+	 <session-config>
+	   <session-timeout>30</session-timeout>
+	 </session-config>
+	 <!-- E: 세션 유지 시간 -->
+	 
+	 <welcome-file-list>
+	   <welcome-file>index.html</welcome-file>
+	   <welcome-file>index.htm</welcome-file>
+	   <welcome-file>index.jsp</welcome-file>
+	   <welcome-file>default.html</welcome-file>
+	   <welcome-file>default.htm</welcome-file>
+	   <welcome-file>default.jsp</welcome-file>
+	 </welcome-file-list>
+	 
+	 <!-- S: 로그인 필터 -->
+	 <filter>
+	         <filter-name>LoginCheck</filter-name>
+	         <filter-class>filter.LoginCheckFilter</filter-class>
+	 </filter>
+	 <filter-mapping>
+	         <filter-name>LoginCheck</filter-name>
+	         <url-pattern>/BoardServlet</url-pattern>
+	         <url-pattern>/CommentServlet</url-pattern>
+	         <url-pattern>/DownloadFileServlet</url-pattern>
+	 </filter-mapping>
+	 <!-- E: 로그인 필터 -->
+	 <!-- S: XSS 필터 -->
+	 <filter>
+	    <filter-name>XSS</filter-name>
+	    <filter-class>filter.CrossScriptingFilter</filter-class>
+	 </filter>
+	 <filter-mapping>
+	    <filter-name>XSS</filter-name>
+	    <url-pattern>/*</url-pattern>
+	 </filter-mapping>
+	 <!-- E: XSS 필터 -->
+	  
+	  
+	  <!-- S:db -->
+	<!-- <servlet>
+		<servlet-name>DBCPInit</servlet-name>
+		<servlet-class>common.util.DBCPInit</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet> -->
+	  <!-- E:db -->
+	  
+	  <!-- S: 로그인 서블릿 -->
+	 <servlet>
+	   <servlet-name>Login</servlet-name>
+	   <servlet-class>member.servlet.LoginServlet</servlet-class>
+	 </servlet>
+	 <servlet-mapping>
+	   <servlet-name>Login</servlet-name>
+	   <url-pattern>/loginServlet</url-pattern>
+	 </servlet-mapping>
+	 <!-- E: 로그인 서블릿 -->
+	 <!-- S: 게시판 서블릿 -->
+	 <servlet>
+	   <servlet-name>Board</servlet-name>
+	   <servlet-class>board.servlet.BoardServlet</servlet-class>
+	 </servlet>
+	 <servlet-mapping>
+	   <servlet-name>Board</servlet-name>
+	   <url-pattern>/BoardServlet</url-pattern>
+	 </servlet-mapping>
+	 <!-- E: 게시판 서블릿 -->
+	 <!-- S: 댓글 서블릿 -->
+	 <servlet>
+	   <servlet-name>Comment</servlet-name>
+	   <servlet-class>board.servlet.CommentServlet</servlet-class>
+	 </servlet>
+	 <servlet-mapping>
+	   <servlet-name>Comment</servlet-name>
+	   <url-pattern>/CommentServlet</url-pattern>
+	 </servlet-mapping>
+	 <!-- E: 댓글 서블릿 -->
+	 <!-- S: 파일다운로드 서블릿 -->
+	 <servlet>
+	   <servlet-name>DownloadFile</servlet-name>
+	   <servlet-class>board.servlet.DownloadFileServlet</servlet-class>
+	 </servlet>
+	 <servlet-mapping>
+	   <servlet-name>DownloadFile</servlet-name>
+	   <url-pattern>/DownloadFileServlet</url-pattern>
+	 </servlet-mapping>
+	 <!-- E: 파일다운로드 서블릿 -->
+	 
+	 <!-- S: 에러페이지 설정 -->
+	 <error-page>
+	 	<error-code>404</error-code>
+	   <location>/errorPage.jsp</location>
+	 </error-page>
+	 <!-- E: 에러페이지 설정 -->
+	 
 	<!-- <resource-ref>
 		<description>connection</description>
 		<res-ref-name>jdbc/mysql</res-ref-name>

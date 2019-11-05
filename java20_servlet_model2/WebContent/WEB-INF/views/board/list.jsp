@@ -23,10 +23,10 @@
 								</select>
 							</li>
 							<li class="col-md-6 col-sm-6">
-								<input class="form-control"  type="text" name="keyword" id="keyword" value="${resultData.keyword}" placeholder="검색어를 입력하세요." />
+								<input class="form-control"  type="text" name="keyword" id="keyword" value="${resultData.keyword}"  data-check="text" placeholder="검색어를 입력하세요." />
 							</li>
 							<li class="col-md-1 col-sm-3 vertical-top">
-								<button type="button" class="btn-sm btn-primary" onClick="frmSend();">검색</button>
+								<button type="button" class="btn-sm btn-primary" onClick="sfrmSend();">검색</button>
 							</li>
 						</ul>
 						</form>
@@ -47,7 +47,11 @@
 				<c:forEach var="obj" items="${boardList}" varStatus="status" >
 					<tr>
 						<td>${resultData.rownum-status.index}</td>
-						<td><a href="/BoardServlet?command=bbsView&no=${obj.id}&page=${resultData.page}${resultData.location}">${obj.title}</a></td>
+						<td>
+							<a href="/BoardServlet?command=bbsView&no=${obj.id}&page=${resultData.page}${resultData.location}">${obj.title}</a>
+							<c:if test="${obj.commentCNT>0}"> <span style="font-size:10px;">[댓글: ${obj.commentCNT}]</span>  </c:if>
+							<c:if test="${obj.fileYN eq 'Y'}"> <span style="font-size:10px;">[파일]</span> </c:if>
+						</td>
 						<td>${obj.userId}</td>
 						<td>${obj.regDate}</td>
 					</tr>
@@ -59,7 +63,6 @@
 				</c:if>
 			</table>
 			<!-- e: 게시판리스트 -->
-		</div>
 		<!-- e: 게시판 -->
 		
 		<!-- s: 페이지번호 -->

@@ -27,7 +27,7 @@ public class NComDB
 		
 		try 
 		{
-
+				
 		}
 		catch (Exception e) 
 		{
@@ -44,6 +44,7 @@ public class NComDB
 		try 
 		{
 			conn=NComDBCPConnector.getConn();
+			System.out.println("connect to Database.!");
 			return eEVENT_SUCCESS;
 		}
 		catch (Exception e) 
@@ -64,6 +65,7 @@ public class NComDB
 			if(rs != null){ rs.close(); rs=null; }
 			if(ps != null){ ps.close(); ps=null; }
 			if(conn != null){ conn.close();conn=null; }
+			System.out.println("clear DB-Connection.!");
 		}
 		catch(Exception e)
 		{

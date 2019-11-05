@@ -65,7 +65,7 @@ public class MemberDao {
 		
 		try{
 			DBconn.dbConn = DBconn.getConnection();
-			pstmt = DBconn.dbConn.prepareStatement( sql );
+			pstmt = DBconn.dbConn.prepareStatement(sql);
 			pstmt.setString( 1, id );
 			rs = pstmt.executeQuery();
 			

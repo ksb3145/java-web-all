@@ -104,15 +104,15 @@
 					<div class="card md-4 shadow-sm">
 						<!-- s: 댓글 입력폼 -->
 						<div class="card-header">
-							<form class="form-inline">
+							<form id="frm" name="frm" class="form-inline">
 								<ul class="list-inline">
 									<li class="col-md-11">
 										<div class="form-group">
-											<input type="text" class="form-control" id="comment" name="comment" placeholder="comment...">
+											<input type="text" class="form-control" id="comment" name="comment" placeholder="댓글을 입력하세요.">
 										</div>
 									</li>
 									<li class="col-md-1 float-r">
-								        <button type="button" class="commentSubmit btn lg green" id="commentSubmit"  class="btn btn-warning" data-cmtgroup="0" data-cmtdepth="0" data-cmtsort="1">등록</button>
+								        <button type="button" class="commentSubmit btn lg green" id="commentSubmit"  class="btn btn-warning"  data-focus="comment" data-cmtgroup="0" data-cmtdepth="0" data-cmtsort="1">등록</button>
 									</li>
 								</ul>
 							</form>
@@ -168,21 +168,32 @@
 	    	var userId 		= $("#userId").val();
 	    	var cmtGroup 	= $(this).data("cmtgroup");
 	    	var cmtDepth 	= $(this).data("cmtdepth");
+	    	var focus 	= $(this).data("focus");
+	    	
 	    	var cmtSort 	= $(this).data("cmtsort");
 	    	
-
-
 	    	if(cmtDepth == 0){
 	    		pid 	= 0;
 	    		comment = $("#comment").val();
+	    		
+	    		
 	    	}else{
 	    		pid 	= $(this).data("cid");
 	    		comment = $("#reComment").val();
 	    	}
 	    	
+	    	console.log(focus);
+	    	
+	    	if(comment == ''){
+				alert("댓글을 입력하세요.");
+				$("#"+focus).focus();
+				return false;
+			}
+	    	
+	    	
 	    	var data = { pid: pid, command: command, boardId: boardId, userId: userId, comment: comment, cmtGroup: cmtGroup, cmtDepth: cmtDepth, cmtSort: cmtSort };
 
-	    	console.log(data);
+	    	//console.log(data);
 	    
 			callAjax(data, url);
 
@@ -203,7 +214,7 @@
 			
 			var html  = "<dd id='addReCommentInput'>";
 				 html += "	<input type='text' id='reComment' name='reComment' />";
-			 	 html += "	<button type='button' class='commentSubmit' class='btn btn-warning' data-cid='"+cid+"' data-cmtgroup='"+cmtGroup+"' data-cmtdepth='"+ cmtDepth +"' data-cmtsort='"+ cmtSort +"'>등록</button>";
+			 	 html += "	<button type='button' class='commentSubmit' class='btn btn-warning'  data-focus='reComment' data-cid='"+cid+"' data-cmtgroup='"+cmtGroup+"' data-cmtdepth='"+ cmtDepth +"' data-cmtsort='"+ cmtSort +"'>등록</button>";
 				 html += "	<button type='button' onClick='reCommentClose();'>닫기</button>";
 				 html += "</dd>";
 
@@ -232,7 +243,7 @@
 			
 			
 			
-			console.log(data,url);
+			//console.log(data,url);
 			
 			if(confirm("정말 삭제하시겠습니까?")){
 				callAjax(data, url);

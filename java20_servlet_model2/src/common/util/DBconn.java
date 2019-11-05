@@ -10,21 +10,9 @@ public class DBconn {
 	// connection
 	public static Connection getConnection() throws ClassNotFoundException, SQLException{
 		if(dbConn == null){
-			String driverName = "com.mysql.jdbc.Driver";
 			
-//			String url = "jdbc:mysql://ncom.iptime.org/test_bom?useUnicode=true&characterEncoding=utf8";
-//			String id = "root";
-//			String pw = "ncom";
-			
-			String url = "jdbc:mysql://localhost:3306/testDB?useUnicode=true&characterEncoding=utf8";
-			String id = "root";
-			String pw = "0000";
-			
-			Class.forName(driverName);
-			System.out.println("Driver 로드..");
-			
-			dbConn = DriverManager.getConnection(url, id, pw);
-			
+			String jdbcDriver = "jdbc:apache:commons:dbcp:cp";
+			dbConn = DriverManager.getConnection(jdbcDriver);
 			System.out.println("DB Connection...");
 		}
 		

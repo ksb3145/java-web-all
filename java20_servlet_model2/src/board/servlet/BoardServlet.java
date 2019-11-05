@@ -63,13 +63,16 @@ public class BoardServlet extends HttpServlet {
 		resp.setContentType("text/html;charset-UTF-8");
 		
 		int page = 1;
-		String location = "";
+		String location = "", fileDir = "";
 		String command = StringUtil.strNullCheck(req.getParameter("command"));
 		String pno = StringUtil.strNullCheck(req.getParameter("page"));
 		
 		if(" ".equals(pno) || null == pno) pno = "1";
 		page = Integer.parseInt(pno);
 		
+		//fileDir = getServletContext().getRealPath("/upload/bbs");
+		fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
+		System.out.println("fileDir = "+fileDir);
 		
 		System.out.println("page ::: "+page);
 		
@@ -206,90 +209,7 @@ public class BoardServlet extends HttpServlet {
 			location= "/WEB-INF/views/board/write.jsp";
 			RequestDispatcher rd = req.getRequestDispatcher(location);
 			rd.forward(req, resp);
-			
-		//}else if(command.equals("bbsInsert")){	
-
-			// 게시글 등록
-//			int result = 0, group = 0, insertId = 0;
-//			String reqFrm 	= req.getParameter("reqFrm");	// 게시글 or 답변 수정
-//			String boardId 	= req.getParameter("boardId");	// 개시글 key (답글일 경우)
-//			String userId 	= req.getParameter("userId");
-//			String title 		= req.getParameter("title");
-//			String content 	= req.getParameter("content");
-//			String bGroup 	= (req.getParameter("bGroup") == null) ? "" : req.getParameter("bGroup");
-//			
-//			BoardVO bvo = new BoardVO();
-//			bvo.setUserId(userId);
-//			bvo.setTitle(title);
-//			bvo.setContent(content);
-//			
-//			if(boardId != "" && reqFrm.equals("bbsReplyInsert")){ 
-//				// 답글은 원글의 그룹넘 
-//				int pid = Integer.parseInt(boardId);	// 부모글의 key
-//				group = Integer.parseInt(bGroup);
-//				
-//				bvo.setPid(pid);
-//				bvo.setbGroup(group);
-//				
-//				insertId = service.boardReInsert(bvo); // 답글 등록
-//				if(0<insertId){
-//					bvo.setId(insertId);
-//					result = service.boardSortNOUpdate(bvo);
-//					System.out.println("up:"+result);
-//				}
-//			}else{
-//				insertId = service.boardInsert(bvo);	// 게시글 등록
-//				if(0<insertId){
-//					// 원글 자신의 키값을 그룹 값에 넣어줌
-//					bvo.setId(insertId);
-//					bvo.setbGroup(insertId);
-//					result = service.boardGroupNOUpdate(bvo);
-//					System.out.println("ins:"+result);
-//				}
-//			}
-//			
-//			if(result>0){
-//				// 등록 성공
-//				req.setAttribute("msg", "성공");	
-//			}else{
-//				// 등록 실패
-//				req.setAttribute("msg","실패!");
-//			}
-//			
-//			location = "/BoardServlet?command=bbsList&page="+page;
-//			
-//			RequestDispatcher rd = req.getRequestDispatcher(location);
-//			rd.forward(req, resp);
-//		}else if(command.equals("bbsUpdate")){	
-//			//게시글 수정
-//			
-//			String no = req.getParameter("boardId");
-//			String userId = req.getParameter("userId");
-//			String title = req.getParameter("title");
-//			String content = req.getParameter("content");
-//			
-//			int boardId = Integer.parseInt(no);	// 게시판id
-//			page = Integer.parseInt(req.getParameter("page"));	// 페이지
-//			
-//			BoardVO bvo = new BoardVO();
-//			bvo.setId(boardId);
-//			bvo.setUserId(userId);
-//			bvo.setTitle(title);
-//			bvo.setContent(content);
-//			
-//			int result = service.boardUpdate(bvo);
-//			
-//			if(result>0){
-//				// 등록 성공
-//				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
-//			}else{
-//				// 등록 실패
-//				location = "/BoardServlet?command=bbsView&no="+boardId+"&page="+page;
-//			}
-//			
-//			RequestDispatcher rd = req.getRequestDispatcher(location);
-//			rd.forward(req, resp);
-//			
+		
 		}else if(command.equals("bbsDelete")){	
 			// 게시글 삭제
 			String userId = req.getParameter("userId");
@@ -301,13 +221,15 @@ public class BoardServlet extends HttpServlet {
 			bvo.setUserId(userId);
 			
 			//1. 삭제 할 글 => 답글 존재?
-			BoardVO resultGroupNum = service.selectBoardGroupKey(bvo);
+			BoardVO resultGroup = service.selectBoardGroupKey(bvo);
 			
 			// 그룹넘 null => 답글 없음
-			if(!resultGroupNum.equals("") && resultGroupNum != null){
+			if(resultGroup != null){
 				//1-1. 답글 있음.
-				bvo.setbGroup(resultGroupNum.getbGroup());
+				bvo.setbGroup(resultGroup.getbGroup());
+				bvo.setPid(resultGroup.getPid());
 			}
+			
 			
 			BoardServlet bs = new BoardServlet();
 			String resultCode = bs.delContents(bvo);
@@ -380,9 +302,8 @@ public class BoardServlet extends HttpServlet {
 		}else if(command.equals("FileDownLoad")){
 			
 			int fId = 0;
-			// 절대경로
-			String fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
-			//String fileDir = getServletContext().getRealPath("/upload/bbs");
+			//fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
+			fileDir = getServletContext().getRealPath("/upload/bbs");	//절대경로	
 			System.out.println("fileDir = "+fileDir);
 			
 			String fileId = StringUtil.strNullCheck(req.getParameter("fileId"));	// 파일 key
@@ -408,68 +329,6 @@ public class BoardServlet extends HttpServlet {
 				// fid값 없음.
 			}
 			
-			
-			
-			//File f = new File("c:\\jdk1.5\\work\\ch14\\FileEx1.java");
-			
-//			
-//			int fId = 0;
-//			String resultCode = "";
-//			String fileId = StringUtil.strNullCheck(req.getParameter("fileId"));
-//			
-//			if(!" ".equals(fileId)) fId = Integer.parseInt(fileId);
-//			
-//			if(fId>0){
-//				FileVO fvo = new FileVO();
-//				fvo.setfId(fId);
-//				
-//				FileVO result = service.selectOneFile(fvo);
-//				
-//				if(result != null){
-//					resultCode = "OK";
-//					
-//					String filePath = "";
-//					File downloadFile = new File(filePath);
-//					FileInputStream inStream = new FileInputStream(downloadFile);
-//					
-//					//ServletContext cxt = getServletContext();
-//					String realtivePath = getServletContext().getRealPath("");
-//					System.out.println("realtivePath = "+realtivePath);
-//					
-//					ServletContext context = getServletContext();
-//					
-//					String mimeType = context.getMimeType(filePath);
-//					if(mimeType == null){
-//						mimeType = "application/actet-stream";
-//					}
-//					System.out.println("MINI type : "+mimeType );
-//					
-//					resp.setContentType(mimeType);
-//					resp.setContentLength((int) downloadFile.length() );
-//					
-//					String headerKey = "Content-Disposition";
-//					String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName() );
-//					resp.setHeader(headerKey, headerValue);
-//					
-//					OutputStream outStream = resp.getOutputStream();
-//					
-//					byte[] buffer = new byte[4096];
-//					int bytesRead = -1;
-//					
-//					while ( (bytesRead = inStream.read(buffer)) != -1 ){
-//						outStream.write(buffer,0,bytesRead);
-//					}
-//					
-//					inStream.close();
-//					outStream.close();
-//					
-//				}else{
-//					resultCode = "E11"; // 결과 값 없음.
-//				}
-//				
-//			}else{
-//				resultCode = "E00";	// fid값 없음.
-//			}
 		}
 	}
 	
@@ -484,11 +343,12 @@ public class BoardServlet extends HttpServlet {
 			
 			int cmtCount = cmtService.selectCommentCount(bvo.getId()); // 코멘트 카운트
 			if(cmtCount > 0) cmtResult = cmtService.commentBidDel(bvo.getId());	// 코멘트 삭제
+			
 		
 			if(bvo.getPid() == 0){
-				resultData = service.boardDel(bvo);	// 게시글 삭제
-			}else{
 				resultData = service.boardGroupDel(bvo);	// 게시글 그룹 삭제 (원글의 하위글까지 모두 삭제)
+			}else{
+				resultData = service.boardDel(bvo);	// 게시글 삭제
 			}
 			if(resultData>0){
 				resultVal = "OK";
@@ -511,6 +371,7 @@ public class BoardServlet extends HttpServlet {
 		
 		
 		//String fileDir = getServletContext().getRealPath("/upload/bbs");
+		//String fileDir = "D://eclipse_wcms_bak/workspace/bomBBS/WebContent/upload/bbs";
 		String fileDir ="/Users/sb/Documents/development/bbsProject/workspace/java20_servlet_model2/upload/bbs";
 		System.out.println(fileDir);
 		
@@ -662,16 +523,16 @@ public class BoardServlet extends HttpServlet {
 		return service.FileDel(fvo);
 	}
 	
-	public String getUrl(HttpServletRequest req){
-		// request URL
-        Enumeration param = req.getParameterNames();
-        String strParam = "";
-        while(param.hasMoreElements()) {
-            String name = (String)param.nextElement();
-            String value = req.getParameter(name);
-            strParam += name + "=" + value + "&";
-        }
-        return req.getRequestURL() + "?" + strParam;
-	}
+//	public String getUrl(HttpServletRequest req){
+//		// request URL
+//        Enumeration param = req.getParameterNames();
+//        String strParam = "";
+//        while(param.hasMoreElements()) {
+//            String name = (String)param.nextElement();
+//            String value = req.getParameter(name);
+//            strParam += name + "=" + value + "&";
+//        }
+//        return req.getRequestURL() + "?" + strParam;
+//	}
 
 }

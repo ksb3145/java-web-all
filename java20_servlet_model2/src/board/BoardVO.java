@@ -15,6 +15,9 @@ public class BoardVO {
 	private int bGroup;		
 	private int bSort;
 	
+	private String fileYN;		// 첨부파일여부
+	private int commentCNT;	// 댓글수
+	
 	public int getRownum() {
 		return rownum;
 	}
@@ -75,5 +78,24 @@ public class BoardVO {
 	public void setbSort(int bSort) {
 		this.bSort = bSort;
 	}
-	
+	public String getFileYN() {
+		return fileYN;
+	}
+	public void setFileYN(String fileYN) {
+		this.fileYN = fileYN;
+	}
+	public int getCommentCNT() {
+		return commentCNT;
+	}
+	public void setCommentCNT(int commentCNT) {
+		this.commentCNT = commentCNT;
+	}
+	@Override
+	public String toString() {
+		return "BoardVO [rownum=" + rownum + ", id=" + id + ", userId="
+				+ userId + ", title=" + title + ", content=" + content
+				+ ", hit=" + hit + ", regDate=" + regDate + ", pid=" + pid
+				+ ", bGroup=" + bGroup + ", bSort=" + bSort + ", fileYN="
+				+ fileYN + ", commentCNT=" + commentCNT + "]";
+	}
 }

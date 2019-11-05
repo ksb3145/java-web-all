@@ -31,13 +31,12 @@
 				
 				<div class="form-group">
 					<label for="title">제목</label>
-					
-					<input type="text" class="form-control" id="title" name="title" value="${reqFrm eq 'insert' ? reTitle : boardDetail.title} " placeholder="아이디를 입력하세요." />
+					<input type="text" class="form-control" id="title" name="title" value="${reqFrm eq 'insert' ? reTitle : boardDetail.title}" data-check="text"  placeholder="제목을 입력하세요." />
 				</div>
 				
 				<div class="form-group">
 					<label for="content">내용</label>
-					<textarea class="form-control" rows="3"  id="content" name="content">${reqFrm eq 'insert' ?  null : boardDetail.content}</textarea>
+					<textarea class="form-control" rows="3"  id="content" data-check="textarea" data-title="내용을 입력하세요." name="content">${reqFrm eq 'insert' ?  null : boardDetail.content}</textarea>
 				</div>
 				
 				<div class="form-group">

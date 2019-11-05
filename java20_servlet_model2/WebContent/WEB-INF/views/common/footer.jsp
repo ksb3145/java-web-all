@@ -9,9 +9,23 @@
 
 <script type="text/javascript">
 <!--
+	// 입력폼체크
 	function frmSend(){
 		
 		if(submitCheck(document.frm)){
+			var frm = document.frm;
+			$("#loading").css("display","block");	// 프로그레스바..
+			frm.submit();
+		}
+	}
+	
+	// 검색폼체크
+	function sfrmSend(){
+		var sType = $("#searchType").val();
+		
+		if(sType){
+			frmSend();
+		}else{
 			var frm = document.frm;
 			$("#loading").css("display","block");	// 프로그레스바..
 			frm.submit();

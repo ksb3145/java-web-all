@@ -62,6 +62,7 @@ public class BoardDao {
 			}catch (SQLException e) {
 				e.printStackTrace();
 			}
+			
 		}
 		return result;
 	}
@@ -194,12 +195,14 @@ public class BoardDao {
 			where += " LIKE '%"+keyword+"%'";
 		}
 		
-		sql  = 		 "SELECT B.* ";
-		sql += 		   "FROM mvc_board B ";
-		sql += 		  "WHERE B.bDelYN='N' "+ where;
-		sql += 	  " ORDER BY bGroup DESC ";
-		sql +=			  ", bRegdate DESC "; 
-		sql += 		  "LIMIT "+offset+","+limit;
+		sql  = 		"SELECT B.* ";
+		sql += 		   	  " , (SELECT COUNT(*) FROM mvc_comment WHERE bId= B.bId AND delYN = 'N') cmtCNT";
+		sql += 		   	  " , IFNULL( (SELECT IF(fId>0,'Y',NULL) FROM mvc_file WHERE bId= B.bId AND delYN = 'N') ,'N') file_YN";
+		sql += 		" FROM mvc_board B ";
+		sql += 	   "WHERE B.bDelYN='N' "+where;
+		sql +=  " ORDER BY bGroup DESC ";
+		sql +=			   ", bRegdate DESC "; 
+		sql += 		 "LIMIT "+offset+","+limit;
 		
 		System.out.println("게시글 전체 리스트 :: "+sql);
 		
@@ -220,6 +223,8 @@ public class BoardDao {
 				bvo.setHit(rs.getInt("bHit"));
 				bvo.setRegDate(rs.getDate("bRegDate"));
 				bvo.setUserId(rs.getString("mUserId"));
+				bvo.setFileYN(rs.getString("file_YN"));
+				bvo.setCommentCNT(rs.getInt("cmtCNT"));
 				
 				boardList.add(bvo);
 			}
@@ -446,7 +451,7 @@ public class BoardDao {
 			PreparedStatement pstmt = null;
 			BoardVO rbvo = null;	//리턴할 객체참조변수
 			
-			String sql = "SELECT bGroup FROM mvc_board WHERE bGroup = ?";
+			String sql = "SELECT DISTINCT bGroup, pId FROM mvc_board WHERE bGroup = ?";
 			
 			System.out.println("게시글 그룹 key ::" +sql +"/"+ bvo.getId());
 			
@@ -459,6 +464,7 @@ public class BoardDao {
 				if(rs.next()){
 					rbvo = new BoardVO();
 					rbvo.setbGroup(rs.getInt("bGroup"));
+					rbvo.setPid(rs.getInt("pId"));
 				}
 				
 			}catch ( SQLException e ) {

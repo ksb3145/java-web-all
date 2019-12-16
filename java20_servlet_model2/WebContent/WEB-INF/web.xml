@@ -24,7 +24,7 @@
 	 <!-- S: 로그인 필터 -->
 	 <filter>
 	         <filter-name>LoginCheck</filter-name>
-	         <filter-class>filter.LoginCheckFilter</filter-class>
+	         <filter-class>common.filter.LoginCheckFilter</filter-class>
 	 </filter>
 	 <filter-mapping>
 	         <filter-name>LoginCheck</filter-name>
@@ -36,7 +36,7 @@
 	 <!-- S: XSS 필터 -->
 	 <filter>
 	    <filter-name>XSS</filter-name>
-	    <filter-class>filter.CrossScriptingFilter</filter-class>
+	    <filter-class>common.filter.CrossScriptingFilter</filter-class>
 	 </filter>
 	 <filter-mapping>
 	    <filter-name>XSS</filter-name>
@@ -56,7 +56,7 @@
 	  <!-- S: 로그인 서블릿 -->
 	 <servlet>
 	   <servlet-name>Login</servlet-name>
-	   <servlet-class>member.servlet.LoginServlet</servlet-class>
+	   <servlet-class>servlet.LoginServlet</servlet-class>
 	 </servlet>
 	 <servlet-mapping>
 	   <servlet-name>Login</servlet-name>
@@ -66,7 +66,7 @@
 	 <!-- S: 게시판 서블릿 -->
 	 <servlet>
 	   <servlet-name>Board</servlet-name>
-	   <servlet-class>board.servlet.BoardServlet</servlet-class>
+	   <servlet-class>servlet.BoardServlet</servlet-class>
 	 </servlet>
 	 <servlet-mapping>
 	   <servlet-name>Board</servlet-name>
@@ -76,7 +76,7 @@
 	 <!-- S: 댓글 서블릿 -->
 	 <servlet>
 	   <servlet-name>Comment</servlet-name>
-	   <servlet-class>board.servlet.CommentServlet</servlet-class>
+	   <servlet-class>servlet.CommentServlet</servlet-class>
 	 </servlet>
 	 <servlet-mapping>
 	   <servlet-name>Comment</servlet-name>
@@ -86,7 +86,7 @@
 	 <!-- S: 파일다운로드 서블릿 -->
 	 <servlet>
 	   <servlet-name>DownloadFile</servlet-name>
-	   <servlet-class>board.servlet.DownloadFileServlet</servlet-class>
+	   <servlet-class>servlet.DownloadFileServlet</servlet-class>
 	 </servlet>
 	 <servlet-mapping>
 	   <servlet-name>DownloadFile</servlet-name>

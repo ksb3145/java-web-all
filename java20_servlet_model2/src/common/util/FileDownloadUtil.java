@@ -12,8 +12,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import board.FileVO;
+import vo.FileVO;
 
+
+/**
+ * 파일 다운로드 
+ * @author dev2
+ *
+ */
 public class FileDownloadUtil {
 	  /** 다운로드 버퍼 크기 */
 	  private static final int BUFFER_SIZE = 8192; // 8kb
